@@ -61,6 +61,65 @@ app.get("/blogEntries", async (req, res) => {
   res.json(toResponse(allBlogEntries));
 });
 
+//listar un post concreto mediante su id
+app.get("/blogEntries/:id", async (req, res) => {
+  const id = req.params.id;
+  //cuando queremos hacer una búsqueda por id, necesitamos el ObjectId
+  const blogEntry = await blogEntries.findOne({ _id: new ObjectId(id) });
+  if (!blogEntry) {
+    res.sendStatus(404);
+  } else {
+    res.json(toResponse(blogEntry));
+  }
+});
+
+//borrar un post concreto
+app.delete("/blogEntries/:id", async (req, res) => {
+  const id = req.params.id;
+  const blogEntry = await blogEntries.findOne({ _id: new ObjectId(id) });
+  if (!blogEntry) {
+    res.sendStatus(404);
+  } else {
+    await blogEntries.deleteOne({ _id: new ObjectId(id) });
+    res.json(toResponse(blogEntry));
+  }
+});
+
+// editar un post en concreto
+app.put("/blogEntries/:id", async (req, res) => {
+  const id = req.params.id;
+  const blogEntry = await blogEntries.findOne({ _id: new ObjectId(id) });
+  if (!blogEntry) {
+    res.sendStatus(404);
+  } else {
+    const updatedBlogEntry = req.body;
+    //Validation
+    if (
+      typeof updatedBlogEntry.name != "string" ||
+      typeof updatedBlogEntry.postText != "string"
+    ) {
+      res.sendStatus(400);
+    } else {
+      //Create object with needed fields and assign id
+      const newBlogEntry = {
+        name: updatedBlogEntry.name,
+        lastName: updatedBlogEntry.lastName,
+        nickname: updatedBlogEntry.nickname,
+        postTitle: updatedBlogEntry.postTitle,
+        postText: updatedBlogEntry.postText
+      };
+      //Update resource
+      await blogEntries.updateOne(
+        { _id: new ObjectId(id) },
+        { $set: newBlogEntry }
+      );
+      //Return new resource
+      newBlogEntry.id = id;
+      res.json(newBlogEntry);
+    }
+  }
+});
+
 /** 
 
 async function insertOneWithId() {
@@ -211,7 +270,7 @@ async function dbConnect() {
 async function main() {
   await dbConnect(); //espera a que se conecte la base de datos
   //y luego levana express
-  app.listen(3012, () => console.log("Server started in port 3000"));
+  app.listen(3017, () => console.log("Server started in port 3017"));
 }
 
 main();
