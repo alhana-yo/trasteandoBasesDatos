@@ -34,15 +34,21 @@ app.post("/blogEntries", async (req, res) => {
   const blogEntry = req.body;
   //valido que la entrada del blog es correcta
   if (
-    typeof blogEntry.message != "string" ||
-    typeof blogEntry.author != "string"
+    // typeof blogEntry.name != "string" ||
+    // typeof blogEntry.lastName != "string"
+    false
   ) {
     res.sendStatus(400);
   } else {
     const newBlogEntry = {
-      message: blogEntry.message,
-      author: blogEntry.author
+      name: blogEntry.name,
+      lastName: blogEntry.lastName,
+      nickname: blogEntry.nickname,
+      postTitle: blogEntry.postTitle,
+      postText: blogEntry.postText,
+      postComments: blogEntry.postComments
     };
+
     //inserto el anuncio nuevo en la colección de la base de datos
     await blogEntries.insertOne(newBlogEntry);
     res.json(toResponse(newBlogEntry));
@@ -213,7 +219,7 @@ async function dbConnect() {
 async function main() {
   await dbConnect(); //espera a que se conecte la base de datos
   //y luego levana express
-  app.listen(3000, () => console.log("Server started in port 3000"));
+  app.listen(3013, () => console.log("Server started in port 3000"));
 }
 
 main();
