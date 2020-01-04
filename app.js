@@ -1,11 +1,55 @@
+// Importo MongoDB y Express
+
 const MongoClient = require("mongodb").MongoClient;
 const ObjectId = require("mongodb").ObjectId;
+const express = require("express");
 
 const url = "mongodb://localhost:27017/BlogDB";
 
-let conn;
-let blogEntries;
+// Creo la aplicación express
+const app = express();
+// y la configuro para que express me parsee automáticamente bodys a json
+app.use(express.json());
 
+//let conn; // esto representa mi base de datos
+let blogEntries; // esto representa la colección de las entradas del blog
+
+//sustituye el id que me pone mongo: le quita el _id que nos pone mongo, por el id que está esperando el API rest
+function toResponse(doc) {
+  if (doc instanceof Array) {
+    toResponse;
+    return doc.map(elem => toResponse(elem));
+  } else {
+    let { _id, ...ret } = doc;
+    ret.id = doc._id.toString();
+    return ret;
+  }
+}
+
+/** Métodos que definen el comportamiento de la API */
+
+//insertar una entrada de blog
+
+app.post("/blogEntries", async (req, res) => {
+  const blogEntry = req.body;
+  //valido que la entrada del blog es correcta
+  if (
+    typeof blogEntry.message != "string" ||
+    typeof blogEntry.author != "string"
+  ) {
+    res.sendStatus(400);
+  } else {
+    const newBlogEntry = {
+      message: blogEntry.message,
+      author: blogEntry.author
+    };
+    //inserto el anuncio nuevo en la colección de la base de datos
+    await blogEntries.insertOne(newBlogEntry);
+    res.json(toResponse(newBlogEntry));
+  }
+});
+
+/** 
 async function insertOne() {
   await blogEntries.insertOne({
     name: "Jack",
@@ -29,12 +73,18 @@ async function insertOneWithId() {
     postTitle: "el primero",
     postText: "lallalalalalallala",
     postComments: [
-      { nickname: "pichi", text: "primer comentario", date: "2/01/2020" }
+      {
+        nickname: "pichi",
+        text: "primer comen de debugger;bugger;tario",
+        date: "2/01/2020"
+      }
     ]
   });
 
   console.log("Post inserted with id:", insertedId);
-
+  console.log("esteeeeeeeeeeeee es el id", insertedId);
+  debugger;
+  //devuelve el id, porque en otro ejemplo posterior, va a borrar este elemento
   return insertedId;
 }
 
@@ -108,6 +158,7 @@ async function findPostById(id) {
 async function updatePostById(id) {
   await blogEntries.updateOne(
     { _id: new ObjectId(id) },
+
     {
       $set: {
         name: "Lorena",
@@ -144,30 +195,25 @@ async function deleteblogEntriesByFirstName() {
   console.log(`Deleted ${deletedCount} blogEntries with name "Jack"`);
 }
 
-async function main() {
-  conn = await MongoClient.connect(url, {
+*/
+
+async function dbConnect() {
+  //creo la conexión a la base de datos (la arranco)
+  let conn = await MongoClient.connect(url, {
     useUnifiedTopology: true,
     useNewUrlParser: true
   });
 
   console.log("Connected to Mongo");
-
+  //Justo después que se conecte la base de datos, inicializo esta variable: la colección de anuncios de la conexión a la base de datos (conn)
+  //esto lo tengo que hacer antes de que ads se use en cualquiera de los métodos, para poder guardar o borrar o editar o consultar cualquier cosa de esa colección.
   blogEntries = conn.db().collection("blogEntries");
-
-  await insertOne();
-  const id = await insertOneWithId();
-  await insertMany();
-  await insertManyWithId();
-  //await findPostWithQuery();
-  await findPostById(id);
-  //await updatePostById(id);
-  //await updateblogEntriesByFirstName();
-  //await deletePostById(id);
-  await deleteblogEntriesByFirstName();
-
-  conn.close();
-
-  console.log("Connection closed");
+  //si yo necesitara acceder a otra colección , podría hacerlo de la misma manera de arriba ¿??¿?
+}
+async function main() {
+  await dbConnect(); //espera a que se conecte la base de datos
+  //y luego levana express
+  app.listen(3000, () => console.log("Server started in port 3000"));
 }
 
 main();
