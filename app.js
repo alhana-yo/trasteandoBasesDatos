@@ -34,9 +34,8 @@ app.post("/blogEntries", async (req, res) => {
   const blogEntry = req.body;
   //valido que la entrada del blog es correcta
   if (
-    // typeof blogEntry.name != "string" ||
-    // typeof blogEntry.lastName != "string"
-    false
+    typeof blogEntry.name != "string" ||
+    typeof blogEntry.postText != "string"
   ) {
     res.sendStatus(400);
   } else {
@@ -53,23 +52,16 @@ app.post("/blogEntries", async (req, res) => {
     await blogEntries.insertOne(newBlogEntry);
     res.json(toResponse(newBlogEntry));
   }
+  console.log("Post inserted");
+});
+
+//listar todos los posts
+app.get("/blogEntries", async (req, res) => {
+  const allBlogEntries = await blogEntries.find().toArray();
+  res.json(toResponse(allBlogEntries));
 });
 
 /** 
-async function insertOne() {
-  await blogEntries.insertOne({
-    name: "Jack",
-    lastName: "Bauer",
-    nickname: "ppppp",
-    postTitle: "el primero",
-    postText: "lallalalalalallala",
-    postComments: [
-      { nickname: "pichi", text: "primer comentario", date: "2/01/2020" }
-    ]
-  });
-
-  console.log("Post inserted");
-}
 
 async function insertOneWithId() {
   const { insertedId } = await blogEntries.insertOne({
@@ -219,7 +211,7 @@ async function dbConnect() {
 async function main() {
   await dbConnect(); //espera a que se conecte la base de datos
   //y luego levana express
-  app.listen(3013, () => console.log("Server started in port 3000"));
+  app.listen(3012, () => console.log("Server started in port 3000"));
 }
 
 main();
