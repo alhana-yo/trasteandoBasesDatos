@@ -54,10 +54,17 @@ app.post("/blogEntries", async (req, res) => {
   console.log("Post inserted");
 });
 
-//listar todos los posts
+//listar todos los posts sin los comentarios
 app.get("/blogEntries", async (req, res) => {
   const allBlogEntries = await blogEntries
-    .find({}, { postComments: 0 })
+    .find(
+      {},
+      {
+        projection: {
+          postComments: 0
+        }
+      }
+    )
     .toArray();
   // const allBlogEntries = await blogEntries.find().toArray();
   res.json(toResponse(allBlogEntries));
@@ -177,7 +184,7 @@ async function dbConnect() {
 async function main() {
   await dbConnect(); //espera a que se conecte la base de datos
   //y luego levana express
-  app.listen(3009, () => console.log("Server started in port 3009"));
+  app.listen(3016, () => console.log("Server started in port 3016"));
 }
 
 main();
