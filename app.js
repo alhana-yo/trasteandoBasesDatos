@@ -56,7 +56,10 @@ app.post("/blogEntries", async (req, res) => {
 
 //listar todos los posts
 app.get("/blogEntries", async (req, res) => {
-  const allBlogEntries = await blogEntries.find().toArray();
+  const allBlogEntries = await blogEntries
+    .find({}, { postComments: 0 })
+    .toArray();
+  // const allBlogEntries = await blogEntries.find().toArray();
   res.json(toResponse(allBlogEntries));
 });
 
@@ -84,6 +87,7 @@ app.delete("/blogEntries/:id", async (req, res) => {
   }
 });
 
+/*
 // editar un post en concreto
 app.put("/blogEntries/:id", async (req, res) => {
   const id = req.params.id;
@@ -118,8 +122,8 @@ app.put("/blogEntries/:id", async (req, res) => {
     }
   }
 });
-
-// insertar un comentario --> NO FUNCIONA
+*/
+// insertar un comentario --> FUNCIONA, pero le tengo que poner una url diferente
 app.put("/blogEntries/:id", async (req, res) => {
   const id = req.params.id;
   const blogEntry = await blogEntries.findOne({ _id: new ObjectId(id) });
@@ -173,7 +177,7 @@ async function dbConnect() {
 async function main() {
   await dbConnect(); //espera a que se conecte la base de datos
   //y luego levana express
-  app.listen(3021, () => console.log("Server started in port 3021"));
+  app.listen(3009, () => console.log("Server started in port 3009"));
 }
 
 main();
