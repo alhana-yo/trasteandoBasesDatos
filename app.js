@@ -1,7 +1,8 @@
-// Importo MongoDB y Express
+// Importo Mongoose y Express
 
-const MongoClient = require("mongodb").MongoClient;
-const ObjectId = require("mongodb").ObjectId;
+//const MongoClient = require("mongodb").MongoClient;
+//const ObjectId = require("mongodb").ObjectId;
+var mongoose = require("mongoose");
 const express = require("express");
 
 const url = "mongodb://localhost:27017/BlogDB";
@@ -11,17 +12,16 @@ const app = express();
 // y la configuro para que express me parsee automáticamente bodys a json
 app.use(express.json());
 
-//let conn; // esto representa mi base de datos
-let blogEntries; // esto representa la colección de las entradas del blog
-
+//let blogEntries; // esto representa la colección de las entradas del blog
+let BlogEntry;
 //sustituye el id que me pone mongo: le quita el _id que nos pone mongo, por el id que está esperando el API rest
 function toResponse(doc) {
   if (doc instanceof Array) {
-    toResponse;
     return doc.map(elem => toResponse(elem));
   } else {
-    let { _id, ...ret } = doc;
-    ret.id = doc._id.toString();
+    let ret = doc.toObject({ versionKey: false });
+    ret.id = ret._id.toString();
+    delete ret._id;
     return ret;
   }
 }
@@ -38,17 +38,17 @@ app.post("/blogEntries", async (req, res) => {
   ) {
     res.sendStatus(400);
   } else {
-    const newBlogEntry = {
+    const newBlogEntry = new BlogEntry({
       name: blogEntry.name,
       lastName: blogEntry.lastName,
       nickname: blogEntry.nickname,
       postTitle: blogEntry.postTitle,
       postText: blogEntry.postText,
       postComments: blogEntry.postComments
-    };
+    });
 
-    //inserto el anuncio nuevo en la colección de la base de datos
-    await blogEntries.insertOne(newBlogEntry);
+    //inserto el post nuevo en la colección de la base de datos
+    await newBlogEntry.save();
     res.json(toResponse(newBlogEntry));
   }
   console.log("Post inserted");
@@ -56,16 +56,16 @@ app.post("/blogEntries", async (req, res) => {
 
 //listar todos los posts sin los comentarios
 app.get("/blogEntries", async (req, res) => {
-  const allBlogEntries = await blogEntries
-    .find(
-      {},
-      {
-        projection: {
-          postComments: 0
-        }
-      }
-    )
-    .toArray();
+  // const allBlogEntries = await BlogEntry.find(
+  //   {},
+  //   {
+  //     projection: {
+  //       postComments: 0
+  //     }
+  //   }
+  // )
+  // .exec();
+  const allBlogEntries = await BlogEntry.find().exec();
   // const allBlogEntries = await blogEntries.find().toArray();
   res.json(toResponse(allBlogEntries));
 });
@@ -238,20 +238,29 @@ app.put("/blogEntries/:id/comments/:commentId", async (req, res) => {
 
 async function dbConnect() {
   //creo la conexión a la base de datos (la arranco)
-  let conn = await MongoClient.connect(url, {
+  await mongoose.connect(url, {
     useUnifiedTopology: true,
-    useNewUrlParser: true
+    useNewUrlParser: true,
+    useFindAndModify: false
   });
 
   console.log("Connected to Mongo");
-  //Justo después que se conecte la base de datos, inicializo esta variable: la colección de anuncios de la conexión a la base de datos (conn)
-  //esto lo tengo que hacer antes de que ads se use en cualquiera de los métodos, para poder guardar o borrar o editar o consultar cualquier cosa de esa colección.
-  blogEntries = conn.db().collection("blogEntries");
-  //si yo necesitara acceder a otra colección , podría hacerlo de la misma manera de arriba ¿??¿?
+
+  var blogEntrySchema = new mongoose.Schema({
+    name: String,
+    lastName: String,
+    nickname: String,
+    postTitle: String,
+    postText: String,
+    postComments: Array
+  });
+
+  BlogEntry = mongoose.model("BlogEntry", blogEntrySchema);
 }
+
 async function main() {
   await dbConnect(); //espera a que se conecte la base de datos
-  //y luego levana express
+  //y luego levanta express
   app.listen(3000, () => console.log("Server started in port 3000"));
 }
 
