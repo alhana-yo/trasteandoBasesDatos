@@ -131,7 +131,7 @@ app.put("/blogEntries/:id", async (req, res) => {
 
 //Para el resto de funciones de comentario, como el editar y el borrar el comentario, va por id, tendría qu eponer:
 // app.post("/blogEntries/:id/comments/:commentId" --> otro nombre de id para que no se haga la picha un lio
-// insertar un comentario --> FUNCIONA, pero le tengo que poner una url diferente
+// insertar un comentario con su id
 app.post("/blogEntries/:id/comments", async (req, res) => {
   const id = req.params.id;
   const blogEntry = await blogEntries.findOne({ _id: new ObjectId(id) });
@@ -154,6 +154,12 @@ app.post("/blogEntries/:id/comments", async (req, res) => {
       //     newComment
       //   }
       // };
+
+      //Agregamos una id al comentario
+      const myCommentId = new ObjectId();
+      newComment.commentId = myCommentId;
+      //Y ponemos la fecha en la que se creó
+      newComment.date = myCommentId.getTimestamp();
       blogEntry.postComments.push(newComment);
       //Update resource
       await blogEntries.updateOne(
