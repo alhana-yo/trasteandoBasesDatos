@@ -94,7 +94,6 @@ app.delete("/blogEntries/:id", async (req, res) => {
   }
 });
 
-/*
 // editar un post en concreto
 app.put("/blogEntries/:id", async (req, res) => {
   const id = req.params.id;
@@ -129,9 +128,11 @@ app.put("/blogEntries/:id", async (req, res) => {
     }
   }
 });
-*/
+
+//Para el resto de funciones de comentario, como el editar y el borrar el comentario, va por id, tendría qu eponer:
+// app.post("/blogEntries/:id/comments/:commentId" --> otro nombre de id para que no se haga la picha un lio
 // insertar un comentario --> FUNCIONA, pero le tengo que poner una url diferente
-app.put("/blogEntries/:id", async (req, res) => {
+app.post("/blogEntries/:id/comments", async (req, res) => {
   const id = req.params.id;
   const blogEntry = await blogEntries.findOne({ _id: new ObjectId(id) });
   if (!blogEntry) {
@@ -140,13 +141,12 @@ app.put("/blogEntries/:id", async (req, res) => {
     const newComment = req.body;
     //Validation
     if (
-      // typeof newComment.nickName != "string" ||
-      // typeof newComment.text != "string"
-      false
+      typeof newComment.nickname != "string" ||
+      typeof newComment.text != "string"
     ) {
+      console.log("no se hace bien la validacion");
       res.sendStatus(400);
     } else {
-      debugger;
       //Create object with updated fields
       // const newBlogEntry = {
       //   postComments: {
@@ -162,8 +162,10 @@ app.put("/blogEntries/:id", async (req, res) => {
         // { $set: newblogEntry }
       );
       //Return new resource
-      newBlogEntry.id = id;
-      res.json(newBlogEntry);
+      blogEntry.id = id;
+      res.json(blogEntry);
+      // newBlogEntry.id = id;
+      // res.json(newBlogEntry);
     }
   }
 });
@@ -184,7 +186,7 @@ async function dbConnect() {
 async function main() {
   await dbConnect(); //espera a que se conecte la base de datos
   //y luego levana express
-  app.listen(3016, () => console.log("Server started in port 3016"));
+  app.listen(3000, () => console.log("Server started in port 3000"));
 }
 
 main();
