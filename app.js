@@ -129,7 +129,7 @@ app.put("/blogEntries/:id", async (req, res) => {
   }
 });
 
-// insertar un comentario con su id
+// insertar un comentario con su id en un post
 app.post("/blogEntries/:id/comments", async (req, res) => {
   const id = req.params.id;
   const blogEntry = await blogEntries.findOne({ _id: new ObjectId(id) });
@@ -176,7 +176,7 @@ app.post("/blogEntries/:id/comments", async (req, res) => {
 
 //Para el resto de funciones de comentario, como el editar y el borrar el comentario, va por id, tendría qu eponer:
 // app.post("/blogEntries/:id/comments/:commentId" --> otro nombre de id para que no se haga la picha un lio
-// NO FUNCIONA: editar un comentario: usamos la id del post y la id del comentario.
+// editar un comentario: usamos la id del post y la id del comentario.
 app.put("/blogEntries/:id/comments/:commentId", async (req, res) => {
   const id = req.params.id;
   const blogEntry = await blogEntries.findOne({ _id: new ObjectId(id) });
@@ -191,48 +191,33 @@ app.put("/blogEntries/:id/comments/:commentId", async (req, res) => {
     //Sacamos la id del comentario a editar
     const commentForUpdatingId = req.params.commentId;
 
-    console.log("El comentario que quiero editar es el: ", commentForUpdating);
-
-    //Buscamos el comentario a editar
-    //falla aqui, en la búsqueda del comentario.
     const query = {
-      postComments: commentForUpdatingId
+      _id: new ObjectId(id),
+      "postComments.commentId": new ObjectId(commentForUpdatingId)
     };
-    const commentForUpdating = await blogEntry.postComments.find(query);
+
+    // const query = {
+    //   "postComments.commentId": new ObjectId(commentForUpdatingId)
+    // };
+
+    // si quiero cambiar sólo uno de las propiedades del objeto comentario
+    // const newValues = {
+    //   $set: { "postComments.$.nickname": updatedCommentInfo.nickname }
+    // };
+
+    const newValues = {
+      $set: { "postComments.$": updatedCommentInfo }
+    };
+
+    const commentForUpdating = await blogEntries.updateOne(query, newValues);
+
+    console.log("El cometario editado es este", commentForUpdating);
     //Validacion del comentario a editar
     if (!commentForUpdating) {
       console.log("No existe el comentario a editar");
       res.sendStatus(404);
-    } else {
-      //validación de la nueva info del comentario
-      if (
-        // typeof updatedCommentInfo.nickname != "string" ||
-        // typeof updatedCommentInfo.text != "string"
-        false
-      ) {
-        res.sendStatus(400);
-      } else {
-        console.log("Por ahora todo va bien");
-        /*
-        //Creamos un objeto con la nueva info del comentario
-        const updatedComment = {
-          nickname: updatedCommentInfonickname,
-          text: updatedCommentInfo.text,
-          date: new ObjectId().getTimestamp()
-        };
-
-        //Update resource ///
-        await blogEntry.postComments.updateOne(
-          { _id: new ObjectId(id) },
-          { $set: newblogEntry }
-        );
-        //Return new resource
-
-        newBlogEntry.id = id;
-        res.json(newBlogEntry);
-        */
-      }
     }
+    console.log("todo ha ido ok");
   }
 });
 
