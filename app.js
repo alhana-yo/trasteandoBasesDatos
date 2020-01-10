@@ -65,7 +65,7 @@ app.get("/blogEntries", async (req, res) => {
   //   }
   // )
   // .exec();
-  const allBlogEntries = await BlogEntry.find().exec();
+  const allBlogEntries = await BlogEntry.find("name lastname").exec();
   // const allBlogEntries = await blogEntries.find().toArray();
   res.json(toResponse(allBlogEntries));
 });
