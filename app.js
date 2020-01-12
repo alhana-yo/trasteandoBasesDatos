@@ -99,7 +99,9 @@ app.delete("/blogEntries/:id", async (req, res) => {
 // editar un post en concreto
 app.put("/blogEntries/:id", async (req, res) => {
   const id = req.params.id;
-  const blogEntry = await blogEntries.findOne({ _id: new ObjectId(id) });
+  //const blogEntry = await blogEntries.findOne({ _id: new ObjectId(id) });
+  const blogEntry = await BlogEntry.findById({ _id: id });
+
   if (!blogEntry) {
     res.sendStatus(404);
   } else {
@@ -120,10 +122,7 @@ app.put("/blogEntries/:id", async (req, res) => {
         postText: updatedBlogEntry.postText
       };
       //Update resource
-      await blogEntries.updateOne(
-        { _id: new ObjectId(id) },
-        { $set: newBlogEntry }
-      );
+      await BlogEntry.findByIdAndUpdate({ _id: id }, { $set: newBlogEntry });
       //Return new resource
       newBlogEntry.id = id;
       res.json(newBlogEntry);
