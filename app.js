@@ -174,7 +174,6 @@ app.post("/blogEntries/:id/comments", async (req, res) => {
   }
 });
 
-//Para el resto de funciones de comentario, como el editar y el borrar el comentario, va por id, tendría qu eponer:
 // app.post("/blogEntries/:id/comments/:commentId" --> otro nombre de id para que no se haga la picha un lio
 // editar un comentario: usamos la id del post y la id del comentario.
 app.put("/blogEntries/:id/comments/:commentId", async (req, res) => {
@@ -216,8 +215,10 @@ app.put("/blogEntries/:id/comments/:commentId", async (req, res) => {
     if (!commentForUpdating) {
       console.log("No existe el comentario a editar");
       res.sendStatus(404);
+    } else {
+      res.json(toResponse(blogEntry));
+      console.log("todo ha ido ok");
     }
-    console.log("todo ha ido ok");
   }
 });
 
