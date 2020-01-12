@@ -221,6 +221,40 @@ app.put("/blogEntries/:id/comments/:commentId", async (req, res) => {
   }
 });
 
+//borra el comentario de un post, según su id
+app.delete("/blogEntries/:id/comments/:commentId", async (req, res) => {
+  const id = req.params.id;
+  const blogEntry = await blogEntries.findOne({ _id: new ObjectId(id) });
+  console.log("El post que quiero editar es el: ", blogEntry);
+  if (!blogEntry) {
+    console.log("No existe el post");
+    res.sendStatus(404);
+  } else {
+    //Sacamos la id del comentario a borrar
+    const commentForUpdatingId = req.params.commentId;
+    console.log("La ide del comentario a borrar es", commentForUpdatingId);
+
+    const query = {
+      _id: new ObjectId(id),
+      "postComments.commentId": new ObjectId(commentForUpdatingId)
+    };
+
+    const itemToDelete = {
+      $pull: { postComments: { commentId: new ObjectId(commentForUpdatingId) } }
+    };
+
+    const commentForUpdating = await blogEntries.updateOne(query, itemToDelete);
+
+    console.log("El cometario editado es este", commentForUpdating);
+    //Validacion del comentario a editar
+    if (!commentForUpdating) {
+      console.log("No existe el comentario a editar");
+      res.sendStatus(404);
+    }
+    console.log("todo ha ido ok");
+  }
+});
+
 async function dbConnect() {
   //creo la conexión a la base de datos (la arranco)
   let conn = await MongoClient.connect(url, {
