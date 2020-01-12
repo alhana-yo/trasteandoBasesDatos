@@ -65,16 +65,16 @@ app.get("/blogEntries", async (req, res) => {
   //   }
   // )
   // .exec();
-  const allBlogEntries = await BlogEntry.find("name lastname").exec();
-  // const allBlogEntries = await blogEntries.find().toArray();
+  //esto no funciona
+  //const allBlogEntries = await BlogEntry.find("name lastname").exec();
+  const allBlogEntries = await BlogEntry.find().exec();
   res.json(toResponse(allBlogEntries));
 });
 
 //listar un post concreto mediante su id
 app.get("/blogEntries/:id", async (req, res) => {
   const id = req.params.id;
-  //cuando queremos hacer una búsqueda por id, necesitamos el ObjectId
-  const blogEntry = await blogEntries.findOne({ _id: new ObjectId(id) });
+  const blogEntry = await BlogEntry.findById({ _id: id });
   if (!blogEntry) {
     res.sendStatus(404);
   } else {
