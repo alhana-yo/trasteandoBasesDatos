@@ -224,7 +224,7 @@ app.put("/blogEntries/:id/comments/:commentId", async (req, res) => {
 //borra el comentario de un post, según su id
 app.delete("/blogEntries/:id/comments/:commentId", async (req, res) => {
   const id = req.params.id;
-  const blogEntry = await blogEntries.findOne({ _id: new ObjectId(id) });
+  let blogEntry = await blogEntries.findOne({ _id: new ObjectId(id) });
   console.log("El post que quiero editar es el: ", blogEntry);
   if (!blogEntry) {
     console.log("No existe el post");
@@ -250,8 +250,11 @@ app.delete("/blogEntries/:id/comments/:commentId", async (req, res) => {
     if (!commentForUpdating) {
       console.log("No existe el comentario a editar");
       res.sendStatus(404);
+    } else {
+      blogEntry = await blogEntries.findOne({ _id: new ObjectId(id) });
+      res.json(toResponse(blogEntry));
+      console.log("todo ha ido ok");
     }
-    console.log("todo ha ido ok");
   }
 });
 
