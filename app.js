@@ -85,12 +85,14 @@ app.get("/blogEntries/:id", async (req, res) => {
 //borrar un post concreto
 app.delete("/blogEntries/:id", async (req, res) => {
   const id = req.params.id;
-  const blogEntry = await blogEntries.findOne({ _id: new ObjectId(id) });
+  const blogEntry = await BlogEntry.findById({ _id: id });
+  console.log("ESta es la entrada que euireo borrar", blogEntry);
   if (!blogEntry) {
     res.sendStatus(404);
   } else {
-    await blogEntries.deleteOne({ _id: new ObjectId(id) });
+    await BlogEntry.findByIdAndDelete({ _id: id });
     res.json(toResponse(blogEntry));
+    console.log("Todo ha ido bien");
   }
 });
 
