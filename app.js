@@ -110,13 +110,15 @@ app.put("/blogEntries/:id", async (req, res) => {
       res.sendStatus(400);
     } else {
       //Create object with needed fields and assign id
+
       const newBlogEntry = {
-        name: updatedBlogEntry.name,
-        lastName: updatedBlogEntry.lastName,
-        nickname: updatedBlogEntry.nickname,
-        postTitle: updatedBlogEntry.postTitle,
-        postText: updatedBlogEntry.postText
+        name: updatedBlogEntry.name || blogEntry.name,
+        lastName: updatedBlogEntry.lastName || blogEntry.lastName,
+        nickname: updatedBlogEntry.nickname || blogEntry.nickname,
+        postTitle: updatedBlogEntry.postTitle || blogEntry.postTitle,
+        postText: updatedBlogEntry.postText || blogEntry.postText
       };
+
       //Update resource
       await blogEntries.updateOne(
         { _id: new ObjectId(id) },
