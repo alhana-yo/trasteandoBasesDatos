@@ -192,6 +192,23 @@ app.put("/blogEntries/:id/comments/:commentId", async (req, res) => {
     //Sacamos la id del comentario a editar
     const commentForUpdatingId = req.params.commentId;
 
+    /////////////////////
+    //Selecciono el comentario a editar
+    const oldComment = blogEntry.postComments.find(
+      element => element.commentId == commentForUpdatingId
+    );
+    console.log("old comment", oldComment);
+
+    //Aquí construyo un objeto nuevo con la info del comentario: si tengo algo nuevo que añadir, pongo lo nuevo, sino, pongo lo que había antes
+    const newCommentInfo = {
+      nickname: updatedCommentInfo.nickname || oldComment.nickname,
+      text: updatedCommentInfo.text || oldComment.text,
+      commentId: updatedCommentInfo.commentId || oldComment.commentId,
+      date: updatedCommentInfo.date || oldComment.date
+    };
+    console.log("comentario editado", newCommentInfo);
+    ////////////////
+
     const query = {
       _id: new ObjectId(id),
       "postComments.commentId": new ObjectId(commentForUpdatingId)
@@ -207,12 +224,12 @@ app.put("/blogEntries/:id/comments/:commentId", async (req, res) => {
     // };
 
     const newValues = {
-      $set: { "postComments.$": updatedCommentInfo }
+      $set: { "postComments.$": newCommentInfo }
     };
 
     const commentForUpdating = await blogEntries.updateOne(query, newValues);
 
-    console.log("El cometario editado es este", commentForUpdating);
+    console.log("después de actualizarlo con updateOne", commentForUpdating);
     //Validacion del comentario a editar
     if (!commentForUpdating) {
       console.log("No existe el comentario a editar");
