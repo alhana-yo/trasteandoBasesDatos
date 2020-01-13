@@ -214,15 +214,6 @@ app.put("/blogEntries/:id/comments/:commentId", async (req, res) => {
       "postComments.commentId": new ObjectId(commentForUpdatingId)
     };
 
-    // const query = {
-    //   "postComments.commentId": new ObjectId(commentForUpdatingId)
-    // };
-
-    // si quiero cambiar sólo uno de las propiedades del objeto comentario
-    // const newValues = {
-    //   $set: { "postComments.$.nickname": updatedCommentInfo.nickname }
-    // };
-
     const newValues = {
       $set: { "postComments.$": newCommentInfo }
     };
