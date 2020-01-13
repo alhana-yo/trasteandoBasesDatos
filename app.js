@@ -180,7 +180,7 @@ app.post("/blogEntries/:id/comments", async (req, res) => {
 // editar un comentario: usamos la id del post y la id del comentario.
 app.put("/blogEntries/:id/comments/:commentId", async (req, res) => {
   const id = req.params.id;
-  const blogEntry = await blogEntries.findOne({ _id: new ObjectId(id) });
+  let blogEntry = await blogEntries.findOne({ _id: new ObjectId(id) });
   console.log("El post que quiero editar es el: ", blogEntry);
   if (!blogEntry) {
     console.log("No existe el post");
@@ -235,6 +235,7 @@ app.put("/blogEntries/:id/comments/:commentId", async (req, res) => {
       console.log("No existe el comentario a editar");
       res.sendStatus(404);
     } else {
+      blogEntry = await blogEntries.findOne({ _id: new ObjectId(id) });
       res.json(toResponse(blogEntry));
       console.log("todo ha ido ok");
     }
