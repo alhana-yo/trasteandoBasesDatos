@@ -64,4 +64,44 @@ exports.updatePost = async function(id, newBlogEntry) {
   );
 };
 
+exports.addNewComment = async function(id, blogEntry, newComment) {
+  //Create object with updated fields
+  // const newBlogEntry = {
+  //   postComments: {
+  //     ...blogEntry.postComments,
+  //     newComment
+  //   }
+  // };
+
+  //Agregamos una id al comentario
+  const myCommentId = new ObjectId();
+  newComment.commentId = myCommentId;
+  //Y ponemos la fecha en la que se creó
+  newComment.date = myCommentId.getTimestamp();
+  blogEntry.postComments.push(newComment);
+  //Update resource
+  await blogEntries.updateOne(
+    { _id: new ObjectId(id) },
+    { $set: blogEntry }
+    // { $set: newblogEntry }
+  );
+};
+
+exports.updateComment = async function(
+  id,
+  commentForUpdatingId,
+  newCommentInfo
+) {
+  const query = {
+    _id: new ObjectId(id),
+    "postComments.commentId": new ObjectId(commentForUpdatingId)
+  };
+
+  const newValues = {
+    $set: { "postComments.$": newCommentInfo }
+  };
+
+  const commentForUpdating = await blogEntries.updateOne(query, newValues);
+  return commentForUpdating;
+};
 main();

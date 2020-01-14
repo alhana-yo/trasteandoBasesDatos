@@ -83,7 +83,6 @@ app.delete("/blogEntries/:id", async (req, res) => {
 // editar un post en concreto
 app.put("/blogEntries/:id", async (req, res) => {
   const id = req.params.id;
-  //const blogEntry = await blogEntries.findOne({ _id: new ObjectId(id) });
   const blogEntry = await repository.findPost(id);
   if (!blogEntry) {
     res.sendStatus(404);
@@ -107,10 +106,6 @@ app.put("/blogEntries/:id", async (req, res) => {
       };
 
       //Update resource
-      // await blogEntries.updateOne(
-      //   { _id: new ObjectId(id) },
-      //   { $set: newBlogEntry }
-      // );
       await repository.updatePost(id, newBlogEntry);
       //Return new resource
       newBlogEntry.id = id;
@@ -122,7 +117,7 @@ app.put("/blogEntries/:id", async (req, res) => {
 // insertar un comentario con su id en un post
 app.post("/blogEntries/:id/comments", async (req, res) => {
   const id = req.params.id;
-  const blogEntry = await blogEntries.findOne({ _id: new ObjectId(id) });
+  const blogEntry = await repository.findPost(id);
   if (!blogEntry) {
     res.sendStatus(404);
   } else {
@@ -135,52 +130,27 @@ app.post("/blogEntries/:id/comments", async (req, res) => {
       console.log("no se hace bien la validacion");
       res.sendStatus(400);
     } else {
-      //Create object with updated fields
-      // const newBlogEntry = {
-      //   postComments: {
-      //     ...blogEntry.postComments,
-      //     newComment
-      //   }
-      // };
+      await repository.addNewComment(id, blogEntry, newComment);
 
-      //Agregamos una id al comentario
-      const myCommentId = new ObjectId();
-      newComment.commentId = myCommentId;
-      //Y ponemos la fecha en la que se creó
-      newComment.date = myCommentId.getTimestamp();
-      blogEntry.postComments.push(newComment);
-      //Update resource
-      await blogEntries.updateOne(
-        { _id: new ObjectId(id) },
-        { $set: blogEntry }
-        // { $set: newblogEntry }
-      );
       //Return new resource
       blogEntry.id = id;
       res.json(blogEntry);
-      // newBlogEntry.id = id;
-      // res.json(newBlogEntry);
     }
   }
 });
 
-// app.post("/blogEntries/:id/comments/:commentId" --> otro nombre de id para que no se haga la picha un lio
 // editar un comentario: usamos la id del post y la id del comentario.
 app.put("/blogEntries/:id/comments/:commentId", async (req, res) => {
   const id = req.params.id;
-  let blogEntry = await blogEntries.findOne({ _id: new ObjectId(id) });
-  console.log("El post que quiero editar es el: ", blogEntry);
+  const blogEntry = await repository.findPost(id);
   if (!blogEntry) {
     console.log("No existe el post");
     res.sendStatus(404);
   } else {
     const updatedCommentInfo = req.body;
-    console.log("La info que quiero editar es: ", updatedCommentInfo);
-
     //Sacamos la id del comentario a editar
     const commentForUpdatingId = req.params.commentId;
 
-    /////////////////////
     //Selecciono el comentario a editar
     const oldComment = blogEntry.postComments.find(
       element => element.commentId == commentForUpdatingId
@@ -194,27 +164,20 @@ app.put("/blogEntries/:id/comments/:commentId", async (req, res) => {
       commentId: updatedCommentInfo.commentId || oldComment.commentId,
       date: updatedCommentInfo.date || oldComment.date
     };
-    console.log("comentario editado", newCommentInfo);
-    ////////////////
 
-    const query = {
-      _id: new ObjectId(id),
-      "postComments.commentId": new ObjectId(commentForUpdatingId)
-    };
+    const commentForUpdating = await repository.updateComment(
+      id,
+      commentForUpdatingId,
+      newCommentInfo
+    );
 
-    const newValues = {
-      $set: { "postComments.$": newCommentInfo }
-    };
-
-    const commentForUpdating = await blogEntries.updateOne(query, newValues);
-
-    console.log("después de actualizarlo con updateOne", commentForUpdating);
     //Validacion del comentario a editar
     if (!commentForUpdating) {
       console.log("No existe el comentario a editar");
       res.sendStatus(404);
     } else {
-      blogEntry = await blogEntries.findOne({ _id: new ObjectId(id) });
+      //blogEntry = await blogEntries.findOne({ _id: new ObjectId(id) });
+      const blogEntry = await repository.findPost(id);
       res.json(toResponse(blogEntry));
       console.log("todo ha ido ok");
     }
