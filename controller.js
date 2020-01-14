@@ -1,18 +1,11 @@
-// Importo MongoDB y Express
-
-const MongoClient = require("mongodb").MongoClient;
-const ObjectId = require("mongodb").ObjectId;
 const express = require("express");
-
-const url = "mongodb://localhost:27017/BlogDB";
+//const insertBlogEntry = require("./repository").insertBlogEntry;
+const repository = require("./repository.js");
 
 // Creo la aplicación express
 const app = express();
 // y la configuro para que express me parsee automáticamente bodys a json
 app.use(express.json());
-
-//let conn; // esto representa mi base de datos
-let blogEntries; // esto representa la colección de las entradas del blog
 
 //sustituye el id que me pone mongo: le quita el _id que nos pone mongo, por el id que está esperando el API rest
 function toResponse(doc) {
@@ -27,6 +20,8 @@ function toResponse(doc) {
 }
 
 /** Métodos que definen el comportamiento de la API */
+
+/***************** BLOGENTRIES COLLECTION *********************/
 
 //insertar una entrada de blog
 app.post("/blogEntries", async (req, res) => {
@@ -48,7 +43,7 @@ app.post("/blogEntries", async (req, res) => {
     };
 
     //inserto el anuncio nuevo en la colección de la base de datos
-    await blogEntries.insertOne(newBlogEntry);
+    repository.insertBlogEntry(newBlogEntry);
     res.json(toResponse(newBlogEntry));
   }
   console.log("Post inserted");
@@ -56,17 +51,7 @@ app.post("/blogEntries", async (req, res) => {
 
 //listar todos los posts sin los comentarios
 app.get("/blogEntries", async (req, res) => {
-  const allBlogEntries = await blogEntries
-    .find(
-      {},
-      {
-        projection: {
-          postComments: 0
-        }
-      }
-    )
-    .toArray();
-  // const allBlogEntries = await blogEntries.find().toArray();
+  const allBlogEntries = await repository.listBlogEntries();
   res.json(toResponse(allBlogEntries));
 });
 
@@ -74,7 +59,7 @@ app.get("/blogEntries", async (req, res) => {
 app.get("/blogEntries/:id", async (req, res) => {
   const id = req.params.id;
   //cuando queremos hacer una búsqueda por id, necesitamos el ObjectId
-  const blogEntry = await blogEntries.findOne({ _id: new ObjectId(id) });
+  const blogEntry = await repository.findPost(id);
   if (!blogEntry) {
     res.sendStatus(404);
   } else {
@@ -85,11 +70,13 @@ app.get("/blogEntries/:id", async (req, res) => {
 //borrar un post concreto
 app.delete("/blogEntries/:id", async (req, res) => {
   const id = req.params.id;
-  const blogEntry = await blogEntries.findOne({ _id: new ObjectId(id) });
+  //const blogEntry = await blogEntries.findOne({ _id: new ObjectId(id) });
+  const blogEntry = await repository.findPost(id);
   if (!blogEntry) {
     res.sendStatus(404);
   } else {
-    await blogEntries.deleteOne({ _id: new ObjectId(id) });
+    // await blogEntries.deleteOne({ _id: new ObjectId(id) });
+    await repository.deletePost(id);
     res.json(toResponse(blogEntry));
   }
 });
@@ -252,7 +239,9 @@ app.delete("/blogEntries/:id/comments/:commentId", async (req, res) => {
     };
 
     const itemToDelete = {
-      $pull: { postComments: { commentId: new ObjectId(commentForUpdatingId) } }
+      $pull: {
+        postComments: { commentId: new ObjectId(commentForUpdatingId) }
+      }
     };
 
     const commentForUpdating = await blogEntries.updateOne(query, itemToDelete);
@@ -270,6 +259,32 @@ app.delete("/blogEntries/:id/comments/:commentId", async (req, res) => {
   }
 });
 
+/***************** END OF BLOGENTRIES COLLECTION *********************/
+
+/***************** WORDS COLLECTION *********************/
+//insertar una entrada de blog
+app.post("/words", async (req, res) => {
+  const word = req.body;
+  //valido que el insulto es correct
+  if (typeof word.name != "string" || typeof word.level != "number") {
+    res.sendStatus(400);
+  } else {
+    const newWord = {
+      name: word.name,
+      lastName: word.lastName,
+      level: word.level
+    };
+
+    //inserto el anuncio nuevo en la colección de la base de datos
+    await words.insertOne(newWord);
+    res.json(toResponse(newWord));
+  }
+  console.log("Word inserted");
+});
+
+/***************** END OF WORDS COLLECTION **************/
+
+/*
 async function dbConnect() {
   //creo la conexión a la base de datos (la arranco)
   let conn = await MongoClient.connect(url, {
@@ -281,6 +296,7 @@ async function dbConnect() {
   //Justo después que se conecte la base de datos, inicializo esta variable: la colección de anuncios de la conexión a la base de datos (conn)
   //esto lo tengo que hacer antes de que ads se use en cualquiera de los métodos, para poder guardar o borrar o editar o consultar cualquier cosa de esa colección.
   blogEntries = conn.db().collection("blogEntries");
+  words = conn.db().collection("words");
   //si yo necesitara acceder a otra colección , podría hacerlo de la misma manera de arriba ¿??¿?
 }
 async function main() {
@@ -290,5 +306,5 @@ async function main() {
 }
 
 main();
-
+*/
 module.exports = app;
