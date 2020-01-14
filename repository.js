@@ -24,11 +24,9 @@ async function dbConnect() {
 
 async function main() {
   await dbConnect(); //espera a que se conecte la base de datos
-
-  //y luego levanta express
-  //   app.listen(3000, () => console.log("Server started in port 3000"));
 }
 
+/***************** BLOGENTRIES COLLECTION *********************/
 exports.insertBlogEntry = async function(newBlogEntry) {
   //inserto el anuncio nuevo en la colección de la base de datos
   await blogEntries.insertOne(newBlogEntry);
@@ -104,4 +102,25 @@ exports.updateComment = async function(
   const commentForUpdating = await blogEntries.updateOne(query, newValues);
   return commentForUpdating;
 };
+
+exports.deleteComment = async function(id, commentForDeletingId) {
+  const query = {
+    _id: new ObjectId(id),
+    "postComments.commentId": new ObjectId(commentForDeletingId)
+  };
+
+  const itemToDelete = {
+    $pull: {
+      postComments: { commentId: new ObjectId(commentForDeletingId) }
+    }
+  };
+
+  const commentForDeleting = await blogEntries.updateOne(query, itemToDelete);
+  return commentForDeleting;
+};
+/***************** END OF BLOGENTRIES COLLECTION *********************/
+
+/***************** WORDS COLLECTION *********************/
+/***************** END OF WORDS COLLECTION **************/
+
 main();

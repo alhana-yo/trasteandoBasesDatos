@@ -142,7 +142,7 @@ app.post("/blogEntries/:id/comments", async (req, res) => {
 // editar un comentario: usamos la id del post y la id del comentario.
 app.put("/blogEntries/:id/comments/:commentId", async (req, res) => {
   const id = req.params.id;
-  const blogEntry = await repository.findPost(id);
+  let blogEntry = await repository.findPost(id);
   if (!blogEntry) {
     console.log("No existe el post");
     res.sendStatus(404);
@@ -177,7 +177,7 @@ app.put("/blogEntries/:id/comments/:commentId", async (req, res) => {
       res.sendStatus(404);
     } else {
       //blogEntry = await blogEntries.findOne({ _id: new ObjectId(id) });
-      const blogEntry = await repository.findPost(id);
+      blogEntry = await repository.findPost(id);
       res.json(toResponse(blogEntry));
       console.log("todo ha ido ok");
     }
@@ -187,36 +187,26 @@ app.put("/blogEntries/:id/comments/:commentId", async (req, res) => {
 //borra el comentario de un post, según su id
 app.delete("/blogEntries/:id/comments/:commentId", async (req, res) => {
   const id = req.params.id;
-  let blogEntry = await blogEntries.findOne({ _id: new ObjectId(id) });
-  console.log("El post que quiero editar es el: ", blogEntry);
+  let blogEntry = await repository.findPost(id);
+
   if (!blogEntry) {
     console.log("No existe el post");
     res.sendStatus(404);
   } else {
     //Sacamos la id del comentario a borrar
-    const commentForUpdatingId = req.params.commentId;
-    console.log("La ide del comentario a borrar es", commentForUpdatingId);
+    const commentForDeletingId = req.params.commentId;
 
-    const query = {
-      _id: new ObjectId(id),
-      "postComments.commentId": new ObjectId(commentForUpdatingId)
-    };
+    const commentForDeleting = await repository.deleteComment(
+      id,
+      commentForDeletingId
+    );
 
-    const itemToDelete = {
-      $pull: {
-        postComments: { commentId: new ObjectId(commentForUpdatingId) }
-      }
-    };
-
-    const commentForUpdating = await blogEntries.updateOne(query, itemToDelete);
-
-    console.log("El cometario editado es este", commentForUpdating);
     //Validacion del comentario a editar
-    if (!commentForUpdating) {
+    if (!commentForDeleting) {
       console.log("No existe el comentario a editar");
       res.sendStatus(404);
     } else {
-      blogEntry = await blogEntries.findOne({ _id: new ObjectId(id) });
+      blogEntry = await repository.findPost(id);
       res.json(toResponse(blogEntry));
       console.log("todo ha ido ok");
     }
@@ -226,7 +216,7 @@ app.delete("/blogEntries/:id/comments/:commentId", async (req, res) => {
 /***************** END OF BLOGENTRIES COLLECTION *********************/
 
 /***************** WORDS COLLECTION *********************/
-//insertar una entrada de blog
+//insertar una nueva palabra
 app.post("/words", async (req, res) => {
   const word = req.body;
   //valido que el insulto es correct
@@ -248,27 +238,4 @@ app.post("/words", async (req, res) => {
 
 /***************** END OF WORDS COLLECTION **************/
 
-/*
-async function dbConnect() {
-  //creo la conexión a la base de datos (la arranco)
-  let conn = await MongoClient.connect(url, {
-    useUnifiedTopology: true,
-    useNewUrlParser: true
-  });
-
-  console.log("Connected to Mongo");
-  //Justo después que se conecte la base de datos, inicializo esta variable: la colección de anuncios de la conexión a la base de datos (conn)
-  //esto lo tengo que hacer antes de que ads se use en cualquiera de los métodos, para poder guardar o borrar o editar o consultar cualquier cosa de esa colección.
-  blogEntries = conn.db().collection("blogEntries");
-  words = conn.db().collection("words");
-  //si yo necesitara acceder a otra colección , podría hacerlo de la misma manera de arriba ¿??¿?
-}
-async function main() {
-  await dbConnect(); //espera a que se conecte la base de datos
-  //y luego levanta express
-  //   app.listen(3000, () => console.log("Server started in port 3000"));
-}
-
-main();
-*/
 module.exports = app;
