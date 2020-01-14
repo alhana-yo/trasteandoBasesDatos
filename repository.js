@@ -57,4 +57,11 @@ exports.deletePost = async function(id) {
   await blogEntries.deleteOne({ _id: new ObjectId(id) });
 };
 
+exports.updatePost = async function(id, newBlogEntry) {
+  await blogEntries.updateOne(
+    { _id: new ObjectId(id) },
+    { $set: newBlogEntry }
+  );
+};
+
 main();

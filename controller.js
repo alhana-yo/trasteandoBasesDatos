@@ -70,7 +70,6 @@ app.get("/blogEntries/:id", async (req, res) => {
 //borrar un post concreto
 app.delete("/blogEntries/:id", async (req, res) => {
   const id = req.params.id;
-  //const blogEntry = await blogEntries.findOne({ _id: new ObjectId(id) });
   const blogEntry = await repository.findPost(id);
   if (!blogEntry) {
     res.sendStatus(404);
@@ -84,7 +83,8 @@ app.delete("/blogEntries/:id", async (req, res) => {
 // editar un post en concreto
 app.put("/blogEntries/:id", async (req, res) => {
   const id = req.params.id;
-  const blogEntry = await blogEntries.findOne({ _id: new ObjectId(id) });
+  //const blogEntry = await blogEntries.findOne({ _id: new ObjectId(id) });
+  const blogEntry = await repository.findPost(id);
   if (!blogEntry) {
     res.sendStatus(404);
   } else {
@@ -107,10 +107,11 @@ app.put("/blogEntries/:id", async (req, res) => {
       };
 
       //Update resource
-      await blogEntries.updateOne(
-        { _id: new ObjectId(id) },
-        { $set: newBlogEntry }
-      );
+      // await blogEntries.updateOne(
+      //   { _id: new ObjectId(id) },
+      //   { $set: newBlogEntry }
+      // );
+      await repository.updatePost(id, newBlogEntry);
       //Return new resource
       newBlogEntry.id = id;
       res.json(newBlogEntry);
