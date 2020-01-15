@@ -153,7 +153,6 @@ exports.deleteComment = async function(id, commentForDeletingId) {
 
 exports.findAllwords = async function() {
   const badwords = await BadWord.find();
-  console.log("listo lo que hay en la base de datos", badwords);
   return badwords;
 };
 

@@ -1,5 +1,6 @@
 const express = require("express");
 const repository = require("./repository.js");
+const validator = require("./validator.js").validator;
 
 // Creo la aplicación express
 const app = express();
@@ -26,6 +27,16 @@ function toResponse(doc) {
     ret.id = doc._id.toString();
     return ret;
   }
+}
+
+/**
+ * Function that checks if there are forbidden words into a comment
+ * @param {*} comment
+ */
+async function hasBadWord(comment) {
+  const badwords = await repository.findAllwords();
+  const result = validator(comment, badwords);
+  return result;
 }
 
 /** Métodos que definen el comportamiento de la API */
@@ -137,11 +148,18 @@ app.post("/blogEntries/:id/comments", async (req, res) => {
       console.log("no se hace bien la validacion");
       res.sendStatus(400);
     } else {
-      await repository.addNewComment(id, blogEntry, newComment);
+      const result = await hasBadWord(newComment.text);
 
-      //Return new resource
-      blogEntry.id = id;
-      res.json(blogEntry);
+      if (!result.isIncluded) {
+        await repository.addNewComment(id, blogEntry, newComment);
+        //Return new resource
+        blogEntry.id = id;
+        res.json(blogEntry);
+      } else {
+        console.log("El comentario tiene las siguientes palabras prohibidas");
+        result.forbiddenWords.forEach(element => console.log(element));
+        res.sendStatus(400);
+      }
     }
   }
 });
