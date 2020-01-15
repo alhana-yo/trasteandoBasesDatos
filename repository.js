@@ -17,12 +17,12 @@ const BadWordSchema = new Schema({
 const BadWord = mongoose.model("BadWord", BadWordSchema);
 
 async function dbConnect() {
-  //creo la conexión a la base de datos (la arranco)
+  //creo la conexión a la base de datos con Mongo
   let conn = await MongoClient.connect(url, {
     useUnifiedTopology: true,
     useNewUrlParser: true
   });
-
+  //creo la conexión a la base de datos con Mongoose
   await mongoose.connect(url, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
@@ -30,11 +30,7 @@ async function dbConnect() {
   });
 
   console.log("Connected to Mongo");
-  //Justo después que se conecte la base de datos, inicializo esta variable: la colección de anuncios de la conexión a la base de datos (conn)
-  //esto lo tengo que hacer antes de que ads se use en cualquiera de los métodos, para poder guardar o borrar o editar o consultar cualquier cosa de esa colección.
   blogEntries = conn.db().collection("blogEntries");
-  // words = conn.db().collection("words");
-  //si yo necesitara acceder a otra colección , podría hacerlo de la misma manera de arriba ¿??¿?
 }
 
 async function main() {

@@ -1,5 +1,4 @@
 const express = require("express");
-//const insertBlogEntry = require("./repository").insertBlogEntry;
 const repository = require("./repository.js");
 
 // Creo la aplicación express
@@ -10,10 +9,14 @@ const app = express();
 // app.use('/entries', require('./repository'));
 // app.use('/badwords', require('./routes/badwords'));
 
-// y la configuro para que express me parsee automáticamente bodys a json
+//Middleware
 app.use(express.json());
 
-//sustituye el id que me pone mongo: le quita el _id que nos pone mongo, por el id que está esperando el API rest
+/**
+ * Método que sustituye el id que me pone mongo:
+ * le quita el _id que nos pone mongo, por el id que está esperando el API rest
+ * @param {*} doc
+ */
 function toResponse(doc) {
   if (doc instanceof Array) {
     toResponse;
@@ -64,7 +67,6 @@ app.get("/blogEntries", async (req, res) => {
 //listar un post concreto mediante su id
 app.get("/blogEntries/:id", async (req, res) => {
   const id = req.params.id;
-  //cuando queremos hacer una búsqueda por id, necesitamos el ObjectId
   const blogEntry = await repository.findPost(id);
   if (!blogEntry) {
     res.sendStatus(404);
@@ -80,7 +82,6 @@ app.delete("/blogEntries/:id", async (req, res) => {
   if (!blogEntry) {
     res.sendStatus(404);
   } else {
-    // await blogEntries.deleteOne({ _id: new ObjectId(id) });
     await repository.deletePost(id);
     res.json(toResponse(blogEntry));
   }
@@ -182,7 +183,6 @@ app.put("/blogEntries/:id/comments/:commentId", async (req, res) => {
       console.log("No existe el comentario a editar");
       res.sendStatus(404);
     } else {
-      //blogEntry = await blogEntries.findOne({ _id: new ObjectId(id) });
       blogEntry = await repository.findPost(id);
       res.json(toResponse(blogEntry));
       console.log("todo ha ido ok");
