@@ -4,6 +4,12 @@ const repository = require("./repository.js");
 
 // Creo la aplicación express
 const app = express();
+// const badwordRouter = express.Router();
+
+// // Routes
+// app.use('/entries', require('./repository'));
+// app.use('/badwords', require('./routes/badwords'));
+
 // y la configuro para que express me parsee automáticamente bodys a json
 app.use(express.json());
 
@@ -217,23 +223,36 @@ app.delete("/blogEntries/:id/comments/:commentId", async (req, res) => {
 
 /***************** WORDS COLLECTION *********************/
 //insertar una nueva palabra
-app.post("/words", async (req, res) => {
-  const word = req.body;
-  //valido que el insulto es correct
-  if (typeof word.name != "string" || typeof word.level != "number") {
-    res.sendStatus(400);
-  } else {
-    const newWord = {
-      name: word.name,
-      lastName: word.lastName,
-      level: word.level
-    };
+// badwordRouter.get("/", async (req, res) => {
+app.get("/badwords", async (req, res) => {
+  const badwords = await repository.findAllwords();
+  res.json(badwords);
+});
 
-    //inserto el anuncio nuevo en la colección de la base de datos
-    await words.insertOne(newWord);
-    res.json(toResponse(newWord));
-  }
-  console.log("Word inserted");
+app.get("/badwords/:id", async (req, res) => {
+  const badword = await repository.findOneWord(req.params.id);
+  res.status(200).json(badword);
+});
+
+app.post("/badwords", async (req, res) => {
+  const badword = await repository.postOneWord(req.body);
+  res.status(200).json(badword);
+});
+
+app.put("/badwords/:id", async (req, res) => {
+  await repository.updateOneWord(req.params.id, req.body);
+  res.status(200);
+  res.json({
+    status: "Badword updated!"
+  });
+});
+
+app.delete("/badwords/:id", async (req, res) => {
+  await repository.deleteOneWord(req.params.id);
+  res.status(200);
+  res.json({
+    status: "Badword removed"
+  });
 });
 
 /***************** END OF WORDS COLLECTION **************/

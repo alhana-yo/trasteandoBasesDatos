@@ -1,8 +1,15 @@
 {
   "name": "node-ddbb-ejem1",
   "version": "1.0.0",
+  "scripts": {
+    "dev": "nodemon app.js"
+  },
   "dependencies": {
     "mongodb": "3.3.5",
-    "express": "4.17.1"
+    "express": "4.17.1",
+    "mongoose": "^5.8.6"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
   }
 }
