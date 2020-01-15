@@ -1,11 +1,20 @@
 // Importo MongoDB y Express
 const MongoClient = require("mongodb").MongoClient;
+const mongoose = require("mongoose");
 const ObjectId = require("mongodb").ObjectId;
 const url = "mongodb://localhost:27017/BlogDB";
 
 //estas son nuestras colecciones
 let blogEntries; // coleccion de entradas del blog
-let words; // coleccion de palabras
+
+//Definimos el esquema para las badwords (están mongoose)
+const Schema = mongoose.Schema;
+
+const BadWordSchema = new Schema({
+  badword: String,
+  level: Number
+});
+const BadWord = mongoose.model("BadWord", BadWordSchema);
 
 async function dbConnect() {
   //creo la conexión a la base de datos (la arranco)
@@ -14,11 +23,17 @@ async function dbConnect() {
     useNewUrlParser: true
   });
 
+  await mongoose.connect(url, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+    useFindAndModify: false
+  });
+
   console.log("Connected to Mongo");
   //Justo después que se conecte la base de datos, inicializo esta variable: la colección de anuncios de la conexión a la base de datos (conn)
   //esto lo tengo que hacer antes de que ads se use en cualquiera de los métodos, para poder guardar o borrar o editar o consultar cualquier cosa de esa colección.
   blogEntries = conn.db().collection("blogEntries");
-  words = conn.db().collection("words");
+  // words = conn.db().collection("words");
   //si yo necesitara acceder a otra colección , podría hacerlo de la misma manera de arriba ¿??¿?
 }
 
@@ -121,6 +136,36 @@ exports.deleteComment = async function(id, commentForDeletingId) {
 /***************** END OF BLOGENTRIES COLLECTION *********************/
 
 /***************** WORDS COLLECTION *********************/
+
+exports.findAllwords = async function() {
+  const badwords = await BadWord.find();
+  return badwords;
+};
+
+//DONE
+exports.findOneWord = async function(id) {
+  const badword = await BadWord.findById(id);
+  console.log(badword);
+  return badword;
+};
+
+//DONE
+exports.postOneWord = async function(word) {
+  const badword = new BadWord(word);
+  await badword.save();
+  return badword;
+};
+
+//DONE
+exports.updateOneWord = async function(id, updatedWord) {
+  await BadWord.findByIdAndUpdate(id, updatedWord);
+};
+
+//DONE
+exports.deleteOneWord = async function(id) {
+  await BadWord.findByIdAndRemove(id);
+};
+
 /***************** END OF WORDS COLLECTION **************/
 
 main();
