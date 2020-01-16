@@ -13,7 +13,10 @@ const Schema = mongoose.Schema;
 const BadWordSchema = new Schema({
   badword: String,
   level: Number
+}, {
+  versionKey: false // set to false then it wont create in mongodb
 });
+
 const BadWord = mongoose.model("BadWord", BadWordSchema);
 
 async function dbConnect() {
