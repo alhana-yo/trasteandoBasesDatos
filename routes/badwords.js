@@ -3,21 +3,22 @@ const badwordRouter = express.Router();
 
 const repository = require("../repository.js");
 
-function toResponse(doc) {
-    if (doc instanceof Array) {
-        toResponse;
-        return doc.map(elem => toResponse(elem));
-    } else {
-        let { _id, ...ret } = doc;
-        ret.id = doc._id.toString();
-        return ret;
-    }
-}
+// function toResponse(doc) {
+//     if (doc instanceof Array) {
+//         toResponse;
+//         return doc.map(elem => toResponse(elem));
+//     } else {
+//         let { _id, ...ret } = doc;
+//         ret.id = doc._id.toString();
+//         return ret;
+//     }
+// }
 
 badwordRouter.get("/", async (req, res) => {
     const badwords = await repository.findAllwords();
     res.json(badwords);
 });
+
 
 badwordRouter.get("/:id", async (req, res) => {
     const badword = await repository.findOneWord(req.params.id);
