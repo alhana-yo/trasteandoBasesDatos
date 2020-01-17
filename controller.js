@@ -157,8 +157,18 @@ app.post("/blogEntries/:id/comments", async (req, res) => {
         res.json(blogEntry);
       } else {
         console.log("El comentario tiene las siguientes palabras prohibidas");
-        result.forbiddenWords.forEach(element => console.log(element));
-        res.sendStatus(400);
+        const includedWords = { words: [] };
+
+        // result.forbiddenWords.forEach(element => console.log(element));
+        result.forbiddenWords.forEach(element => {
+          let badWordInComment = {};
+          badWordInComment.badword = element.badword;
+          badWordInComment.level = element.level;
+          includedWords.words.push(badWordInComment);
+        });
+
+        // res.sendStatus(400)
+        res.json(includedWords);
       }
     }
   }
