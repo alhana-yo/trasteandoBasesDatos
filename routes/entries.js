@@ -2,17 +2,7 @@ const express = require('express');
 const entryRouter = express.Router();
 
 const repository = require("../repository.js");
-
-function toResponse(doc) {
-    if (doc instanceof Array) {
-        toResponse;
-        return doc.map(elem => toResponse(elem));
-    } else {
-        let { _id, ...ret } = doc;
-        ret.id = doc._id.toString();
-        return ret;
-    }
-}
+const toResponse = require("../toResponse.js");
 
 entryRouter.post("/", async (req, res) => {
     const blogEntry = req.body;

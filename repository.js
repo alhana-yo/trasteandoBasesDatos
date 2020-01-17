@@ -141,26 +141,22 @@ exports.findAllwords = async function () {
   return badwords;
 };
 
-//DONE
 exports.findOneWord = async function (id) {
   const badword = await BadWord.findById(id);
   console.log(badword);
   return badword;
 };
 
-//DONE
 exports.postOneWord = async function (word) {
   const badword = new BadWord(word);
   await badword.save();
   return badword;
 };
 
-//DONE
 exports.updateOneWord = async function (id, updatedWord) {
   await BadWord.findByIdAndUpdate(id, updatedWord);
 };
 
-//DONE
 exports.deleteOneWord = async function (id) {
   await BadWord.findByIdAndRemove(id);
 };
