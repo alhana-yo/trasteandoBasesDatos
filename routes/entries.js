@@ -37,7 +37,6 @@ entryRouter.post("/", async (req, res) => {
     repository.insertBlogEntry(newBlogEntry);
     res.json(toResponse(newBlogEntry));
   }
-  console.log("Post inserted");
 });
 
 //listar todos los posts sin los comentarios
@@ -116,7 +115,6 @@ entryRouter.post("/:id/comments", async (req, res) => {
       typeof newComment.nickname != "string" ||
       typeof newComment.text != "string"
     ) {
-      console.log("no se hace bien la validacion");
       res.sendStatus(400);
     } else {
       const result = await hasBadWord(newComment.text);
@@ -127,16 +125,15 @@ entryRouter.post("/:id/comments", async (req, res) => {
         blogEntry.id = id;
         res.json(blogEntry);
       } else {
-        console.log("El comentario tiene las siguientes palabras prohibidas");
         const includedWords = { words: [] };
 
-        // result.forbiddenWords.forEach(element => console.log(element));
         result.forbiddenWords.forEach(element => {
           let badWordInComment = {};
           badWordInComment.badword = element.badword;
           badWordInComment.level = element.level;
           includedWords.words.push(badWordInComment);
         });
+
 
         // res.sendStatus(400)
         res.status(400).json(includedWords);
@@ -150,7 +147,6 @@ entryRouter.put("/:id/comments/:commentId", async (req, res) => {
   const id = req.params.id;
   let blogEntry = await repository.findPost(id);
   if (!blogEntry) {
-    console.log("No existe el post");
     res.sendStatus(404);
   } else {
     const updatedCommentInfo = req.body;
@@ -161,7 +157,6 @@ entryRouter.put("/:id/comments/:commentId", async (req, res) => {
     const oldComment = blogEntry.postComments.find(
       element => element.commentId == commentForUpdatingId
     );
-    console.log("old comment", oldComment);
 
     //Aquí construyo un objeto nuevo con la info del comentario: si tengo algo nuevo que añadir, pongo lo nuevo, sino, pongo lo que había antes
     const newCommentInfo = {
@@ -180,9 +175,7 @@ entryRouter.put("/:id/comments/:commentId", async (req, res) => {
 
       blogEntry = await repository.findPost(id);
       res.status(200).json(toResponse(blogEntry));
-      console.log("todo ha ido ok");
     } else {
-      console.log("El comentario tiene las siguientes palabras prohibidas");
       const includedWords = { words: [] };
 
       result.forbiddenWords.forEach(element => {
@@ -203,7 +196,6 @@ entryRouter.delete("/:id/comments/:commentId", async (req, res) => {
   let blogEntry = await repository.findPost(id);
 
   if (!blogEntry) {
-    console.log("No existe el post");
     res.sendStatus(404);
   } else {
     //Sacamos la id del comentario a borrar
@@ -216,12 +208,10 @@ entryRouter.delete("/:id/comments/:commentId", async (req, res) => {
 
     //Validacion del comentario a editar
     if (!commentForDeleting) {
-      console.log("No existe el comentario a editar");
       res.sendStatus(404);
     } else {
       blogEntry = await repository.findPost(id);
-      res.json(toResponse(blogEntry));
-      console.log("todo ha ido ok");
+      res.status(200).json(toResponse(blogEntry));
     }
   }
 });
