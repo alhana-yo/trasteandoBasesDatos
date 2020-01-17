@@ -1,7 +1,7 @@
 // Importo MongoDB y Express
 const MongoClient = require("mongodb").MongoClient;
-const mongoose = require("mongoose");
 const ObjectId = require("mongodb").ObjectId;
+const mongoose = require("mongoose");
 const url = "mongodb://localhost:27017/BlogDB";
 const defaultBadWords = require("./defBadWords");
 //estas son nuestras colecciones
@@ -13,7 +13,10 @@ const Schema = mongoose.Schema;
 const BadWordSchema = new Schema({
   badword: String,
   level: Number
+}, {
+  versionKey: false // set to false then it wont create in mongodb
 });
+
 const BadWord = mongoose.model("BadWord", BadWordSchema);
 
 async function dbConnect() {
@@ -56,12 +59,12 @@ async function main() {
 }
 
 /***************** BLOGENTRIES COLLECTION *********************/
-exports.insertBlogEntry = async function(newBlogEntry) {
+exports.insertBlogEntry = async function (newBlogEntry) {
   //inserto el anuncio nuevo en la colección de la base de datos
   await blogEntries.insertOne(newBlogEntry);
 };
 
-exports.listBlogEntries = async function() {
+exports.listBlogEntries = async function () {
   const allBlogEntries = await blogEntries
     .find(
       {},
@@ -75,23 +78,23 @@ exports.listBlogEntries = async function() {
   return allBlogEntries;
 };
 
-exports.findPost = async function(id) {
+exports.findPost = async function (id) {
   const blogEntry = await blogEntries.findOne({ _id: new ObjectId(id) });
   return blogEntry;
 };
 
-exports.deletePost = async function(id) {
+exports.deletePost = async function (id) {
   await blogEntries.deleteOne({ _id: new ObjectId(id) });
 };
 
-exports.updatePost = async function(id, newBlogEntry) {
+exports.updatePost = async function (id, newBlogEntry) {
   await blogEntries.updateOne(
     { _id: new ObjectId(id) },
     { $set: newBlogEntry }
   );
 };
 
-exports.addNewComment = async function(id, blogEntry, newComment) {
+exports.addNewComment = async function (id, blogEntry, newComment) {
   //Create object with updated fields
   // const newBlogEntry = {
   //   postComments: {
@@ -114,7 +117,7 @@ exports.addNewComment = async function(id, blogEntry, newComment) {
   );
 };
 
-exports.updateComment = async function(
+exports.updateComment = async function (
   id,
   commentForUpdatingId,
   newCommentInfo
@@ -132,7 +135,7 @@ exports.updateComment = async function(
   return commentForUpdating;
 };
 
-exports.deleteComment = async function(id, commentForDeletingId) {
+exports.deleteComment = async function (id, commentForDeletingId) {
   const query = {
     _id: new ObjectId(id),
     "postComments.commentId": new ObjectId(commentForDeletingId)
@@ -151,32 +154,28 @@ exports.deleteComment = async function(id, commentForDeletingId) {
 
 /***************** WORDS COLLECTION *********************/
 
-exports.findAllwords = async function() {
+exports.findAllwords = async function () {
   const badwords = await BadWord.find();
   return badwords;
 };
 
-//DONE
-exports.findOneWord = async function(id) {
+exports.findOneWord = async function (id) {
   const badword = await BadWord.findById(id);
   console.log(badword);
   return badword;
 };
 
-//DONE
-exports.postOneWord = async function(word) {
+exports.postOneWord = async function (word) {
   const badword = new BadWord(word);
   await badword.save();
   return badword;
 };
 
-//DONE
-exports.updateOneWord = async function(id, updatedWord) {
+exports.updateOneWord = async function (id, updatedWord) {
   await BadWord.findByIdAndUpdate(id, updatedWord);
 };
 
-//DONE
-exports.deleteOneWord = async function(id) {
+exports.deleteOneWord = async function (id) {
   await BadWord.findByIdAndRemove(id);
 };
 
