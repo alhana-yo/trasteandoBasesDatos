@@ -200,6 +200,35 @@ app.put("/blogEntries/:id/comments/:commentId", async (req, res) => {
       date: updatedCommentInfo.date || oldComment.date
     };
 
+    //comprobamos si el comentario tiene palabras prohibidas
+    const result = await hasBadWord(newCommentInfo.text);
+
+    if (!result.isIncluded) {
+      await repository.updateComment(id, commentForUpdatingId, newCommentInfo);
+      //Return updated resource
+
+      blogEntry = await repository.findPost(id);
+      res.status(200).json(toResponse(blogEntry));
+      console.log("todo ha ido ok");
+      // blogEntry.id = id;
+      // res.status(200).json(blogEntry);
+    } else {
+      console.log("El comentario tiene las siguientes palabras prohibidas");
+      const includedWords = { words: [] };
+
+      // result.forbiddenWords.forEach(element => console.log(element));
+      result.forbiddenWords.forEach(element => {
+        let badWordInComment = {};
+        badWordInComment.badword = element.badword;
+        badWordInComment.level = element.level;
+        includedWords.words.push(badWordInComment);
+      });
+
+      // res.sendStatus(400)
+      res.status(400).json(includedWords);
+    }
+
+    /*
     const commentForUpdating = await repository.updateComment(
       id,
       commentForUpdatingId,
@@ -207,6 +236,7 @@ app.put("/blogEntries/:id/comments/:commentId", async (req, res) => {
     );
 
     //Validacion del comentario a editar
+
     if (!commentForUpdating) {
       console.log("No existe el comentario a editar");
       res.sendStatus(404);
@@ -215,6 +245,7 @@ app.put("/blogEntries/:id/comments/:commentId", async (req, res) => {
       res.json(toResponse(blogEntry));
       console.log("todo ha ido ok");
     }
+    */
   }
 });
 
