@@ -14,5 +14,10 @@ describe('comments validator', () => {
 
         expect(input.isIncluded).toBeFalsy();
 
+    });
+    test('verify that the comment has forbidden words in UPPERCASE', () => {
+        const comment = 'hello BITCH';
+        const input = validator.validator(comment, badWords)
+        expect(input.isIncluded).toBeTruthy();
     })
 });
