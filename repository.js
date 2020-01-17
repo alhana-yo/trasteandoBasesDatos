@@ -17,7 +17,16 @@ const BadWordSchema = new Schema({
   versionKey: false // set to false then it wont create in mongodb
 });
 
+const UserSchema = new Schema({
+  author: String,
+  nickname: String,
+  role: String
+}, {
+  versionKey: false
+})
+
 const BadWord = mongoose.model("BadWord", BadWordSchema);
+const User = mongoose.model('User', UserSchema);
 
 async function dbConnect() {
   //creo la conexión a la base de datos con Mongo
@@ -143,7 +152,6 @@ exports.findAllwords = async function () {
 
 exports.findOneWord = async function (id) {
   const badword = await BadWord.findById(id);
-  console.log(badword);
   return badword;
 };
 
@@ -162,5 +170,25 @@ exports.deleteOneWord = async function (id) {
 };
 
 /***************** END OF WORDS COLLECTION **************/
+
+/***************** USERS COLLECTION *********************/
+
+exports.findAllusers = async function () {
+  const users = await User.find();
+  return users;
+};
+
+exports.findOneUser = async function (id) {
+  const user = await User.findById(id);
+  return user;
+};
+
+exports.postOneUser = async function (user) {
+  const newUser = new User(user);
+  await newUser.save();
+  return newUser;
+};
+
+/***************** END OF USERS COLLECTION **************/
 
 main();
