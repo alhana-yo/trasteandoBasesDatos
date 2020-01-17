@@ -168,7 +168,7 @@ app.post("/blogEntries/:id/comments", async (req, res) => {
         });
 
         // res.sendStatus(400)
-        res.json(includedWords);
+        res.status(400).json(includedWords);
       }
     }
   }
