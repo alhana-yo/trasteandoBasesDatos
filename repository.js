@@ -3,7 +3,7 @@ const MongoClient = require("mongodb").MongoClient;
 const ObjectId = require("mongodb").ObjectId;
 const mongoose = require("mongoose");
 const url = "mongodb://localhost:27017/BlogDB";
-
+const defaultBadWords = require("./defBadWords");
 //estas son nuestras colecciones
 let blogEntries; // coleccion de entradas del blog
 
@@ -36,8 +36,26 @@ async function dbConnect() {
   blogEntries = conn.db().collection("blogEntries");
 }
 
+/**
+ * This function checks if de data base is empty. If it is, it put some
+ * default dates into the database
+ * @param {*} collection
+ * @param {*} defaultContent
+ */
+async function isEmpty(collection, defaultContent) {
+  const bdContent = await collection.find();
+  if (bdContent.length == 0) {
+    //si no está vacia, la relleno con las palabras por defecto
+    await collection.insertMany(defaultContent);
+    return true;
+  } else {
+    return false;
+  }
+}
+
 async function main() {
   await dbConnect(); //espera a que se conecte la base de datos
+  await isEmpty(BadWord, defaultBadWords);
 }
 
 /***************** BLOGENTRIES COLLECTION *********************/
