@@ -1,7 +1,10 @@
 const express = require('express');
 const userRouter = express.Router();
 
-const repository = require("../repository.js");
+// const repository = require("../repository.js");
+
+const repository = require('../repositories/users.js');
+
 // const passport = require('passport');
 
 // Aquí ya vendrían los métodos CRUD que estñan en las routes de cada colección

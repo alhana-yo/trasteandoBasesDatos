@@ -10,6 +10,8 @@ const defaultBadWords = require("./defBadWords");
 const User = require('./models/users.js');
 const BadWord = require('./models/badwords.js');
 
+// require('./repositories/badwords.js');
+
 //Mongo collections
 let blogEntries; // coleccion de entradas del blog
 
@@ -55,25 +57,6 @@ exports.init = async function () {
 //   return await bcrypt.compare(password, user.passwordHash);
 // }
 
-/***************** USERS COLLECTION *********************/
-
-exports.findAllusers = async function () {
-  const users = await User.find();
-  return users;
-};
-
-exports.findOneUser = async function (id) {
-  const user = await User.findById(id);
-  return user;
-};
-
-exports.postOneUser = async function (user) {
-  const newUser = new User(user);
-  await newUser.save();
-  return newUser;
-};
-
-/***************** END OF USERS COLLECTION **************/
 
 async function dbConnect() {
   //Conexión a la base de datos con Mongo
@@ -211,33 +194,5 @@ exports.deleteComment = async function (id, commentForDeletingId) {
   return commentForDeleting;
 };
 /***************** END OF BLOGENTRIES COLLECTION *********************/
-
-/***************** WORDS COLLECTION *********************/
-
-exports.findAllwords = async function () {
-  const badwords = await BadWord.find();
-  return badwords;
-};
-
-exports.findOneWord = async function (id) {
-  const badword = await BadWord.findById(id);
-  return badword;
-};
-
-exports.postOneWord = async function (word) {
-  const badword = new BadWord(word);
-  await badword.save();
-  return badword;
-};
-
-exports.updateOneWord = async function (id, updatedWord) {
-  await BadWord.findByIdAndUpdate(id, updatedWord);
-};
-
-exports.deleteOneWord = async function (id) {
-  await BadWord.findByIdAndRemove(id);
-};
-
-/***************** END OF WORDS COLLECTION **************/
 
 main();
