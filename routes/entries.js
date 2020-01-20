@@ -6,6 +6,22 @@ const entriesRepository = require("../repository.js");
 const toResponse = require("../toResponse.js");
 const validator = require("../validator.js").validator;
 
+const passport = require("passport");
+const BasicStrategy = require("passport-http").BasicStrategy;
+
+//Function for verify users
+function verify(username, password, done) {
+  if (username == "admin" && password == "pass") {
+    return done(null, { username, password });
+  } else {
+    return done(null, false, { message: "Incorrect username or password" });
+  }
+}
+
+passport.use(new BasicStrategy(verify));
+//Uno passport al propio express
+entryRouter.use(passport.initialize());
+
 /**
  * Function that checks if there are forbidden words into a comment
  * @param {*} comment
@@ -16,7 +32,7 @@ async function hasBadWord(comment) {
   return result;
 }
 
-entryRouter.post("/", async (req, res) => {
+entryRouter.post("/", passport.authenticate("basic", { session: false }), async (req, res) => {
   const blogEntry = req.body;
   //valido que la entrada del blog es correcta
   if (
@@ -58,7 +74,7 @@ entryRouter.get("/:id", async (req, res) => {
 });
 
 //borrar un post concreto
-entryRouter.delete("/:id", async (req, res) => {
+entryRouter.delete("/:id", passport.authenticate("basic", { session: false }), async (req, res) => {
   const id = req.params.id;
   const blogEntry = await entriesRepository.findPost(id);
   if (!blogEntry) {
@@ -70,7 +86,7 @@ entryRouter.delete("/:id", async (req, res) => {
 });
 
 // editar un post en concreto
-entryRouter.put("/:id", async (req, res) => {
+entryRouter.put("/:id", passport.authenticate("basic", { session: false }), async (req, res) => {
   const id = req.params.id;
   const blogEntry = await entriesRepository.findPost(id);
   if (!blogEntry) {
@@ -104,7 +120,7 @@ entryRouter.put("/:id", async (req, res) => {
 });
 
 // insertar un comentario con su id en un post
-entryRouter.post("/:id/comments", async (req, res) => {
+entryRouter.post("/:id/comments", passport.authenticate("basic", { session: false }), async (req, res) => {
   const id = req.params.id;
   const blogEntry = await entriesRepository
     .findPost(id);
@@ -146,7 +162,7 @@ entryRouter.post("/:id/comments", async (req, res) => {
 });
 
 // editar un comentario: usamos la id del post y la id del comentario.
-entryRouter.put("/:id/comments/:commentId", async (req, res) => {
+entryRouter.put("/:id/comments/:commentId", passport.authenticate("basic", { session: false }), async (req, res) => {
   const id = req.params.id;
   let blogEntry = await entriesRepository
     .findPost(id);
@@ -197,7 +213,7 @@ entryRouter.put("/:id/comments/:commentId", async (req, res) => {
 });
 
 //borra el comentario de un post, según su id
-entryRouter.delete("/:id/comments/:commentId", async (req, res) => {
+entryRouter.delete("/:id/comments/:commentId", passport.authenticate("basic", { session: false }), async (req, res) => {
   const id = req.params.id;
   let blogEntry = await entriesRepository
     .findPost(id);
