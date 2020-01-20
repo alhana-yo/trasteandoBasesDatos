@@ -4,6 +4,20 @@ const entryRouter = express.Router();
 const repository = require("../repository.js");
 const toResponse = require("../toResponse.js");
 const validator = require("../validator.js").validator;
+const passport = require("passport");
+const BasicStrategy = require("passport-http").BasicStrategy;
+
+function verify(username, password, done) {
+  if (username == "admin" && password == "pass") {
+    return done(null, { username, password });
+  } else {
+    return done(null, false, { message: "Incorrect username or password" });
+  }
+}
+
+passport.use(new BasicStrategy(verify));
+//Uno passport al propio express
+entryRouter.use(passport.initialize());
 
 /**
  * Function that checks if there are forbidden words into a comment
@@ -40,10 +54,14 @@ entryRouter.post("/", async (req, res) => {
 });
 
 //listar todos los posts sin los comentarios
-entryRouter.get("/", async (req, res) => {
-  const allBlogEntries = await repository.listBlogEntries();
-  res.json(toResponse(allBlogEntries));
-});
+entryRouter.get(
+  "/",
+  passport.authenticate("basic", { session: false }),
+  async (req, res) => {
+    const allBlogEntries = await repository.listBlogEntries();
+    res.json(toResponse(allBlogEntries));
+  }
+);
 
 //listar un post concreto mediante su id
 entryRouter.get("/:id", async (req, res) => {
@@ -133,7 +151,6 @@ entryRouter.post("/:id/comments", async (req, res) => {
           badWordInComment.level = element.level;
           includedWords.words.push(badWordInComment);
         });
-
 
         // res.sendStatus(400)
         res.status(400).json(includedWords);
