@@ -2,39 +2,87 @@
 const MongoClient = require("mongodb").MongoClient;
 const ObjectId = require("mongodb").ObjectId;
 const mongoose = require("mongoose");
+// var bcrypt = require('bcrypt');
+
 const url = "mongodb://localhost:27017/BlogDB";
 const defaultBadWords = require("./defBadWords");
-//estas son nuestras colecciones
+
+const User = require('./models/users.js');
+const BadWord = require('./models/badwords.js');
+
+//Mongo collections
 let blogEntries; // coleccion de entradas del blog
 
-//Definimos el esquema para las badwords (están mongoose)
-const Schema = mongoose.Schema;
+//Sacar a otro módulo
+// async function createSampleUsers() {
+//   await addUser('user1', 'pass1', 'role1');
+//   await addUser('user2', 'pass2', 'role2');
+//   await addUser('user3', 'pass3', 'role3');
+// }
 
-const BadWordSchema = new Schema({
-  badword: String,
-  level: Number
-}, {
-  versionKey: false // set to false then it wont create in mongodb
-});
+// async function addUser(username, password, role) {
+//   let passwordHash = await bcrypt.hash(password, bcrypt.genSaltSync(8), null);
 
-const UserSchema = new Schema({
-  author: String,
-  nickname: String,
-  role: String
-}, {
-  versionKey: false
-})
+//   let user = await User.findOne({ username }).exec();
 
-const BadWord = mongoose.model("BadWord", BadWordSchema);
-const User = mongoose.model('User', UserSchema);
+//   if (!user) {
+//     user = new User({ username, passwordHash, role });
+//   } else {
+//     user.passwordHash = passwordHash;
+//   }
+
+//   await user.save();
+// }
+
+exports.init = async function () {
+
+  // await mongoose.connect(url, {
+  //     useUnifiedTopology: true,
+  //     useNewUrlParser: true,
+  //     useFindAndModify: false
+  // });
+
+  // console.log("Connected to Mongo");
+
+  // createSampleUsers();
+}
+
+// exports.find = async function (username) {
+//   return await User.findOne({ username }).exec();
+// }
+
+// exports.verifyPassword = async function (user, password) {
+//   return await bcrypt.compare(password, user.passwordHash);
+// }
+
+/***************** USERS COLLECTION *********************/
+
+exports.findAllusers = async function () {
+  const users = await User.find();
+  return users;
+};
+
+exports.findOneUser = async function (id) {
+  const user = await User.findById(id);
+  return user;
+};
+
+exports.postOneUser = async function (user) {
+  const newUser = new User(user);
+  await newUser.save();
+  return newUser;
+};
+
+/***************** END OF USERS COLLECTION **************/
 
 async function dbConnect() {
-  //creo la conexión a la base de datos con Mongo
+  //Conexión a la base de datos con Mongo
   let conn = await MongoClient.connect(url, {
     useUnifiedTopology: true,
     useNewUrlParser: true
   });
-  //creo la conexión a la base de datos con Mongoose
+
+  //Conexión a la base de datos con Mongoose
   await mongoose.connect(url, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
@@ -42,6 +90,9 @@ async function dbConnect() {
   });
 
   console.log("Connected to Mongo");
+
+  // createSampleUsers();
+
   blogEntries = conn.db().collection("blogEntries");
 }
 
@@ -188,25 +239,5 @@ exports.deleteOneWord = async function (id) {
 };
 
 /***************** END OF WORDS COLLECTION **************/
-
-/***************** USERS COLLECTION *********************/
-
-exports.findAllusers = async function () {
-  const users = await User.find();
-  return users;
-};
-
-exports.findOneUser = async function (id) {
-  const user = await User.findById(id);
-  return user;
-};
-
-exports.postOneUser = async function (user) {
-  const newUser = new User(user);
-  await newUser.save();
-  return newUser;
-};
-
-/***************** END OF USERS COLLECTION **************/
 
 main();
