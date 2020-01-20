@@ -1,7 +1,8 @@
 const express = require("express");
 const entryRouter = express.Router();
 
-const repository = require("../repository.js");
+const badwordsRepository = require("../repositories/badwords.js");
+const entriesRepository = require("../repository.js");
 const toResponse = require("../toResponse.js");
 const validator = require("../validator.js").validator;
 
@@ -10,7 +11,7 @@ const validator = require("../validator.js").validator;
  * @param {*} comment
  */
 async function hasBadWord(comment) {
-  const badwords = await repository.findAllwords();
+  const badwords = await badwordsRepository.findAllwords();
   const result = validator(comment, badwords);
   return result;
 }
@@ -34,21 +35,21 @@ entryRouter.post("/", async (req, res) => {
     };
 
     //inserto el anuncio nuevo en la colección de la base de datos
-    repository.insertBlogEntry(newBlogEntry);
+    entriesRepository.insertBlogEntry(newBlogEntry);
     res.json(toResponse(newBlogEntry));
   }
 });
 
 //listar todos los posts sin los comentarios
 entryRouter.get("/", async (req, res) => {
-  const allBlogEntries = await repository.listBlogEntries();
+  const allBlogEntries = await entriesRepository.listBlogEntries();
   res.json(toResponse(allBlogEntries));
 });
 
 //listar un post concreto mediante su id
 entryRouter.get("/:id", async (req, res) => {
   const id = req.params.id;
-  const blogEntry = await repository.findPost(id);
+  const blogEntry = await entriesRepository.findPost(id);
   if (!blogEntry) {
     res.sendStatus(404);
   } else {
@@ -59,11 +60,11 @@ entryRouter.get("/:id", async (req, res) => {
 //borrar un post concreto
 entryRouter.delete("/:id", async (req, res) => {
   const id = req.params.id;
-  const blogEntry = await repository.findPost(id);
+  const blogEntry = await entriesRepository.findPost(id);
   if (!blogEntry) {
     res.sendStatus(404);
   } else {
-    await repository.deletePost(id);
+    await entriesRepository.deletePost(id);
     res.json(toResponse(blogEntry));
   }
 });
@@ -71,7 +72,7 @@ entryRouter.delete("/:id", async (req, res) => {
 // editar un post en concreto
 entryRouter.put("/:id", async (req, res) => {
   const id = req.params.id;
-  const blogEntry = await repository.findPost(id);
+  const blogEntry = await entriesRepository.findPost(id);
   if (!blogEntry) {
     res.sendStatus(404);
   } else {
@@ -94,7 +95,7 @@ entryRouter.put("/:id", async (req, res) => {
       };
 
       //Update resource
-      await repository.updatePost(id, newBlogEntry);
+      await entriesRepository.updatePost(id, newBlogEntry);
       //Return new resource
       newBlogEntry.id = id;
       res.json(newBlogEntry);
@@ -105,7 +106,8 @@ entryRouter.put("/:id", async (req, res) => {
 // insertar un comentario con su id en un post
 entryRouter.post("/:id/comments", async (req, res) => {
   const id = req.params.id;
-  const blogEntry = await repository.findPost(id);
+  const blogEntry = await entriesRepository
+    .findPost(id);
   if (!blogEntry) {
     res.sendStatus(404);
   } else {
@@ -120,7 +122,8 @@ entryRouter.post("/:id/comments", async (req, res) => {
       const result = await hasBadWord(newComment.text);
 
       if (!result.isIncluded) {
-        await repository.addNewComment(id, blogEntry, newComment);
+        await entriesRepository
+          .addNewComment(id, blogEntry, newComment);
         //Return new resource
         blogEntry.id = id;
         res.json(blogEntry);
@@ -145,7 +148,8 @@ entryRouter.post("/:id/comments", async (req, res) => {
 // editar un comentario: usamos la id del post y la id del comentario.
 entryRouter.put("/:id/comments/:commentId", async (req, res) => {
   const id = req.params.id;
-  let blogEntry = await repository.findPost(id);
+  let blogEntry = await entriesRepository
+    .findPost(id);
   if (!blogEntry) {
     res.sendStatus(404);
   } else {
@@ -170,10 +174,12 @@ entryRouter.put("/:id/comments/:commentId", async (req, res) => {
     const result = await hasBadWord(newCommentInfo.text);
 
     if (!result.isIncluded) {
-      await repository.updateComment(id, commentForUpdatingId, newCommentInfo);
+      await entriesRepository
+        .updateComment(id, commentForUpdatingId, newCommentInfo);
       //Return updated resource
 
-      blogEntry = await repository.findPost(id);
+      blogEntry = await entriesRepository
+        .findPost(id);
       res.status(200).json(toResponse(blogEntry));
     } else {
       const includedWords = { words: [] };
@@ -193,7 +199,8 @@ entryRouter.put("/:id/comments/:commentId", async (req, res) => {
 //borra el comentario de un post, según su id
 entryRouter.delete("/:id/comments/:commentId", async (req, res) => {
   const id = req.params.id;
-  let blogEntry = await repository.findPost(id);
+  let blogEntry = await entriesRepository
+    .findPost(id);
 
   if (!blogEntry) {
     res.sendStatus(404);
@@ -201,16 +208,18 @@ entryRouter.delete("/:id/comments/:commentId", async (req, res) => {
     //Sacamos la id del comentario a borrar
     const commentForDeletingId = req.params.commentId;
 
-    const commentForDeleting = await repository.deleteComment(
-      id,
-      commentForDeletingId
-    );
+    const commentForDeleting = await entriesRepository
+      .deleteComment(
+        id,
+        commentForDeletingId
+      );
 
     //Validacion del comentario a editar
     if (!commentForDeleting) {
       res.sendStatus(404);
     } else {
-      blogEntry = await repository.findPost(id);
+      blogEntry = await entriesRepository
+        .findPost(id);
       res.status(200).json(toResponse(blogEntry));
     }
   }

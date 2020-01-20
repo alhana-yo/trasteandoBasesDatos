@@ -2,7 +2,7 @@ const express = require("express");
 // const repository = require("./repository.js");
 
 const passport = require('passport');
-const BasicStrategy = require('passport-http').BasicStrategy;
+// const BasicStrategy = require('passport-http').BasicStrategy;
 
 // Creo la aplicación express
 const app = express();

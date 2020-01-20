@@ -5,58 +5,12 @@ const mongoose = require("mongoose");
 // var bcrypt = require('bcrypt');
 
 const url = "mongodb://localhost:27017/BlogDB";
+
 const defaultBadWords = require("./defBadWords");
-
-const User = require('./models/users.js');
 const BadWord = require('./models/badwords.js');
-
-// require('./repositories/badwords.js');
 
 //Mongo collections
 let blogEntries; // coleccion de entradas del blog
-
-//Sacar a otro módulo
-// async function createSampleUsers() {
-//   await addUser('user1', 'pass1', 'role1');
-//   await addUser('user2', 'pass2', 'role2');
-//   await addUser('user3', 'pass3', 'role3');
-// }
-
-// async function addUser(username, password, role) {
-//   let passwordHash = await bcrypt.hash(password, bcrypt.genSaltSync(8), null);
-
-//   let user = await User.findOne({ username }).exec();
-
-//   if (!user) {
-//     user = new User({ username, passwordHash, role });
-//   } else {
-//     user.passwordHash = passwordHash;
-//   }
-
-//   await user.save();
-// }
-
-exports.init = async function () {
-
-  // await mongoose.connect(url, {
-  //     useUnifiedTopology: true,
-  //     useNewUrlParser: true,
-  //     useFindAndModify: false
-  // });
-
-  // console.log("Connected to Mongo");
-
-  // createSampleUsers();
-}
-
-// exports.find = async function (username) {
-//   return await User.findOne({ username }).exec();
-// }
-
-// exports.verifyPassword = async function (user, password) {
-//   return await bcrypt.compare(password, user.passwordHash);
-// }
-
 
 async function dbConnect() {
   //Conexión a la base de datos con Mongo
