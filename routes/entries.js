@@ -10,11 +10,18 @@ const passport = require("passport");
 const BasicStrategy = require("passport-http").BasicStrategy;
 
 //Function for verify users
-function verify(username, password, done) {
-  if (username == "admin" && password == "pass") {
-    return done(null, { username, password });
+// const users = require('../users_example.js');
+
+async function verify(username, password, done) {
+  var user = await users.find(username);
+
+  if (!user) {
+    return done(null, false, { message: 'User not found' });
+  }
+  if (await users.verifyPassword(user, password)) {
+    return done(null, user);
   } else {
-    return done(null, false, { message: "Incorrect username or password" });
+    return done(null, false, { message: 'Incorrect password' });
   }
 }
 

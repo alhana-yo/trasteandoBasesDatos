@@ -1,32 +1,7 @@
 const express = require('express');
 const userRouter = express.Router();
 
-// const repository = require("../repository.js");
-
 const repository = require('../repositories/users.js');
-
-// const passport = require('passport');
-
-// Aquí ya vendrían los métodos CRUD que estñan en las routes de cada colección
-// app.get('/ads',
-//     passport.authenticate('basic', { session: false }),
-//     (req, res) => {
-
-//         console.log('Logged user:', req.user);
-
-//         var sampleAds = [
-//             { id: 0, message: "Vendo moto", author: "Pepe" },
-//             { id: 1, message: "Compro TV", author: "Juan" },
-//             { id: 2, message: "Cambio manta", author: "Julián" }
-//         ];
-
-//         res.json(sampleAds);
-//     });
-
-// users.init();
-
-
-
 
 userRouter.get("/", async (req, res) => {
     // console.log('Logged user:', req.user);
