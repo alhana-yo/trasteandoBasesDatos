@@ -7,27 +7,6 @@ const toResponse = require("../toResponse.js");
 const validator = require("../validator.js").validator;
 
 const passport = require("passport");
-const BasicStrategy = require("passport-http").BasicStrategy;
-
-//Function for verify users
-// const users = require('../users_example.js');
-
-async function verify(username, password, done) {
-  var user = await users.find(username);
-
-  if (!user) {
-    return done(null, false, { message: 'User not found' });
-  }
-  if (await users.verifyPassword(user, password)) {
-    return done(null, user);
-  } else {
-    return done(null, false, { message: 'Incorrect password' });
-  }
-}
-
-passport.use(new BasicStrategy(verify));
-//Uno passport al propio express
-entryRouter.use(passport.initialize());
 
 /**
  * Function that checks if there are forbidden words into a comment

@@ -1,29 +1,16 @@
-const express = require("express");
-// const repository = require("./repository.js");
+const express = require('express');
+const loginRouter = express.Router();
 
 const passport = require('passport');
 const BasicStrategy = require("passport-http").BasicStrategy;
+const bcrypt = require('bcrypt');
 
 const jwt = require('jsonwebtoken');
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 
-const users = require('./repositories/users');
+const User = require('../models/users.js');
 
-// Creo la aplicación express
-const app = express();
-
-//Middleware
-app.use(express.json());
-app.use(passport.initialize());
-
-// Routes
-app.use('/login', require('./routes/login'));
-app.use('/blogEntries', require('./routes/entries'));
-app.use('/badwords', require('./routes/badwords'));
-app.use('/users', require('./routes/users'));
-
-// const SECRET_KEY = process.env.SECRETKEY;
 const SECRET_KEY = 'SECRET_KEY'
 
 async function verify(username, password, done) {
@@ -42,7 +29,22 @@ async function verify(username, password, done) {
 
 passport.use(new BasicStrategy(verify));
 
-app.use(passport.initialize());
+// async function find(username) {
+//     return await User.findOne({ username }).exec();
+// }
+
+// async function verifyPassword (user, password) {
+//     return await bcrypt.compare(password, user.passwordHash);
+// }
+
+function login(req, res) {
+    const { username, password } = req.body;
+
+    const opts = { expiresIn: 600 };
+    const token = jwt.sign({ username, password }, SECRET_KEY, opts);
+
+    return res.status(200).json({ message: "Auth Passed", token });
+}
 
 const jwtOpts = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -60,4 +62,6 @@ passport.use(new JwtStrategy(jwtOpts, async (payload, done) => {
 
 }));
 
-module.exports = app;
+loginRouter.post('/', passport.authenticate('basic', { session: false }), login)
+
+module.exports = login;
