@@ -26,9 +26,7 @@ async function addUser(username, nickname, password, role) {
 
 registerRouter.post('/', async (req, res) => {
 
-    const username = req.body.username;
-    const nickname = req.body.nickname;
-    const password = req.body.password;
+    const { username, nickname, password } = req.body;
 
     await addUser(username, nickname, password, role = 'publisher');
 
