@@ -42,14 +42,12 @@ loginRouter.post('/', passport.authenticate('basic', { session: false }),
     (req, res) => {
 
         const { username } = req.user;
-
-        console.log('req.user: ', req.user);
+        const role = req.user.role;
 
         const opts = { expiresIn: 86400 }; //token expires in 24 hours
         const token = jwt.sign({ username }, SECRET_KEY, opts);
 
-        return res.status(200).json({ message: "Auth Passed", token });
-
+        return res.status(200).json({ message: "Auth Passed", token, role });
     });
 
 const jwtOpts = {
