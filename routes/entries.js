@@ -18,7 +18,7 @@ async function hasBadWord(comment) {
   return result;
 }
 
-entryRouter.post("/", passport.authenticate("basic", { session: false }), async (req, res) => {
+entryRouter.post("/", passport.authenticate('jwt', { session: false }), async (req, res) => {
   const blogEntry = req.body;
   //valido que la entrada del blog es correcta
   if (
@@ -60,7 +60,7 @@ entryRouter.get("/:id", async (req, res) => {
 });
 
 //borrar un post concreto
-entryRouter.delete("/:id", passport.authenticate("basic", { session: false }), async (req, res) => {
+entryRouter.delete("/:id", passport.authenticate('jwt', { session: false }), async (req, res) => {
   const id = req.params.id;
   const blogEntry = await entriesRepository.findPost(id);
   if (!blogEntry) {
@@ -72,7 +72,7 @@ entryRouter.delete("/:id", passport.authenticate("basic", { session: false }), a
 });
 
 // editar un post en concreto
-entryRouter.put("/:id", passport.authenticate("basic", { session: false }), async (req, res) => {
+entryRouter.put("/:id", passport.authenticate('jwt', { session: false }), async (req, res) => {
   const id = req.params.id;
   const blogEntry = await entriesRepository.findPost(id);
   if (!blogEntry) {
@@ -106,7 +106,7 @@ entryRouter.put("/:id", passport.authenticate("basic", { session: false }), asyn
 });
 
 // insertar un comentario con su id en un post
-entryRouter.post("/:id/comments", passport.authenticate("basic", { session: false }), async (req, res) => {
+entryRouter.post("/:id/comments", passport.authenticate('jwt', { session: false }), async (req, res) => {
   const id = req.params.id;
   const blogEntry = await entriesRepository
     .findPost(id);
@@ -148,7 +148,7 @@ entryRouter.post("/:id/comments", passport.authenticate("basic", { session: fals
 });
 
 // editar un comentario: usamos la id del post y la id del comentario.
-entryRouter.put("/:id/comments/:commentId", passport.authenticate("basic", { session: false }), async (req, res) => {
+entryRouter.put("/:id/comments/:commentId", passport.authenticate('jwt', { session: false }), async (req, res) => {
   const id = req.params.id;
   let blogEntry = await entriesRepository
     .findPost(id);
@@ -199,7 +199,7 @@ entryRouter.put("/:id/comments/:commentId", passport.authenticate("basic", { ses
 });
 
 //borra el comentario de un post, según su id
-entryRouter.delete("/:id/comments/:commentId", passport.authenticate("basic", { session: false }), async (req, res) => {
+entryRouter.delete("/:id/comments/:commentId", passport.authenticate('jwt', { session: false }), async (req, res) => {
   const id = req.params.id;
   let blogEntry = await entriesRepository
     .findPost(id);

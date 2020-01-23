@@ -3,48 +3,54 @@ const loginRouter = express.Router();
 
 const passport = require('passport');
 const BasicStrategy = require("passport-http").BasicStrategy;
-const bcrypt = require('bcrypt');
 
 const jwt = require('jsonwebtoken');
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 
-const User = require('../models/users.js');
+const users = require('../load_admins');
 
 const SECRET_KEY = 'SECRET_KEY'
 
-async function verify(username, password, done) {
+const app = express();
 
+app.use(passport.initialize());
+
+//Basic Auth
+async function verify(username, password, done) {
+    console.log('users: ', users);
     let user = await users.find(username);
+
     if (!user) {
         return done(null, false, { message: 'User not found' });
     }
 
-    if (await users.verifyPassword(user, password)) {
+    if (await users.verifyPassword(username, password)) {
         return done(null, user);
+
     } else {
         return done(null, false, { message: 'Incorrect password' });
     }
 }
 
+
+
 passport.use(new BasicStrategy(verify));
 
-// async function find(username) {
-//     return await User.findOne({ username }).exec();
-// }
+//Ruta para el login y generación de token para acceder a las rutas protegidas
+loginRouter.post('/', passport.authenticate('basic', { session: false }),
+    (req, res) => {
 
-// async function verifyPassword (user, password) {
-//     return await bcrypt.compare(password, user.passwordHash);
-// }
+        const { username } = req.user;
 
-function login(req, res) {
-    const { username, password } = req.body;
+        console.log('req.user: ', req.user);
 
-    const opts = { expiresIn: 600 };
-    const token = jwt.sign({ username, password }, SECRET_KEY, opts);
+        const opts = { expiresIn: 86400 }; //token expires in 24 hours
+        const token = jwt.sign({ username }, SECRET_KEY, opts);
 
-    return res.status(200).json({ message: "Auth Passed", token });
-}
+        return res.status(200).json({ message: "Auth Passed", token });
+
+    });
 
 const jwtOpts = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -53,7 +59,8 @@ const jwtOpts = {
 
 passport.use(new JwtStrategy(jwtOpts, async (payload, done) => {
 
-    const user = await users.find(payload.username);
+    var user = await users.find(payload.username);
+
     if (user) {
         return done(null, user);
     } else {
@@ -62,6 +69,4 @@ passport.use(new JwtStrategy(jwtOpts, async (payload, done) => {
 
 }));
 
-loginRouter.post('/', passport.authenticate('basic', { session: false }), login)
-
-module.exports = login;
+module.exports = loginRouter;

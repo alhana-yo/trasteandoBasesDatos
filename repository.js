@@ -2,15 +2,13 @@
 const MongoClient = require("mongodb").MongoClient;
 const ObjectId = require("mongodb").ObjectId;
 const mongoose = require("mongoose");
-// var bcrypt = require('bcrypt');
 
 const url = "mongodb://localhost:27017/BlogDB";
 
 const defaultBadWords = require("./defBadWords");
 const BadWord = require("./models/badwords.js");
 
-const defaultAdmins = require("./load_admins");
-const Users = require("./models/users.js");
+const usersModule = require('./repositories/users.js');
 
 //Mongo collections
 let blogEntries; // coleccion de entradas del blog
@@ -31,7 +29,7 @@ async function dbConnect() {
 
   console.log("Connected to Mongo");
 
-  // createSampleUsers();
+  usersModule.createSampleAdmins();
 
   blogEntries = conn.db().collection("blogEntries");
 }
@@ -53,11 +51,13 @@ async function isEmpty(collection, defaultContent) {
   }
 }
 
+
 async function main() {
   await dbConnect(); //espera a que se conecte la base de datos
   await isEmpty(BadWord, defaultBadWords);
-  await isEmpty(Users, defaultAdmins);
+  // await isEmpty(Users, defaultAdmins);
 }
+
 
 /***************** BLOGENTRIES COLLECTION *********************/
 exports.insertBlogEntry = async function (newBlogEntry) {
