@@ -1,10 +1,14 @@
 const User = require('../models/users.js');
 const bcrypt = require('bcrypt');
 
+const defAdmins = require('../load_admins.js');
+
+
+
 exports.createSampleAdmins = async function () {
-    await addUser('beatriz', 'bea', 'pass1', 'admin');
-    await addUser('katherine', 'kath', 'pass2', 'admin');
-    await addUser('ada', 'ada-lovelace', 'pass3', 'admin');
+    defAdmins.forEach(async user => {
+        await addUser(user.username, user.nickname, user.password, user.role);
+    })
 }
 
 //Registrar nuevo usuario

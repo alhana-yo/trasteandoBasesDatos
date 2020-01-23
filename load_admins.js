@@ -16,5 +16,11 @@ module.exports = [
     "nickname": "ada lovalace",
     "password": "pass3",
     "role": "admin"
+  },
+  {
+    "username": "marta",
+    "nickname": "marta3000",
+    "password": "pass4",
+    "role": "admin"
   }
 ];
