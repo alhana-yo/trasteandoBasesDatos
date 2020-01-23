@@ -18,7 +18,6 @@ app.use(passport.initialize());
 
 //Basic Auth
 async function verify(username, password, done) {
-    console.log('users: ', users);
     let user = await users.find(username);
 
     if (!user) {
@@ -32,8 +31,6 @@ async function verify(username, password, done) {
         return done(null, false, { message: 'Incorrect password' });
     }
 }
-
-
 
 passport.use(new BasicStrategy(verify));
 

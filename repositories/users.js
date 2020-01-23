@@ -4,7 +4,6 @@ const bcrypt = require('bcrypt');
 const defAdmins = require('../load_admins.js');
 
 
-
 exports.createSampleAdmins = async function () {
     defAdmins.forEach(async user => {
         await addUser(user.username, user.nickname, user.password, user.role);

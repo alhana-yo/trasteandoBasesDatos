@@ -1,35 +1,38 @@
+const express = require('express');
+const registerRouter = express.Router();
 
-// const Register = require('../models/register');
-// const defAdmin = require('../defAdmin');
+const bcrypt = require('bcrypt');
+const User = require('../models/users')
 
-// exports.addUser = async function (user) {
-//     const { nickname, password, username, role = "publisher" } = user;
-//     const passwordHash = await bcrypt.hash(password, bcrypt.genSaltSync(8), null);
 
-//     var user = await User.findOne({ username }).exec();
+async function addUser(username, nickname, password, role) {
+    //generación de clave encriptada
+    var passwordHash = await bcrypt.hash(password, bcrypt.genSaltSync(8), null);
 
-//     if (!user) {
-//         user = new User({ username, passwordHash, role, nickname });
-//     } else {
-//         user.passwordHash = passwordHash;
-//     }
+    //busco el username en la BBDD
+    var user = await User.findOne({ username }).exec();
 
-//     await user.save();
-// }
+    //si no está registrado, creo un nuevo usuario
+    if (!user) {
+        user = new User({ username, nickname, passwordHash, role });
+        // le asigno el passwordHash que corresponde a la clave introducida
+    } else {
+        user.passwordHash = passwordHash;
+    }
 
-// exports.registerNewUser = function (req, res) {
-//     let register = new Register();
-//     register.username = req.body.username;
-//     register.nickname = req.body.nickname;
-//     register.password = req.body.password;
-//     register.role = 'publisher';
+    //Guardo el nuevo usuario en la BBDD
+    await user.save();
+}
 
-//     register.save((err, register) => {
-//         if (err) res.status(500).send({ message: `Sign in error: ${err}` });
-//     })
+registerRouter.post('/', async (req, res) => {
 
-//     res.status(200).send({ message: 'the user has successfully registered', register });
-//     addUser(register.username, register.password, register.role, register.nickname);
+    const username = req.body.username;
+    const nickname = req.body.nickname;
+    const password = req.body.password;
 
-// }
-// addUser(defAdmin.username, defAdmin.password, defAdmin.role, defAdmin.nickname);
+    await addUser(username, nickname, password, role = 'publisher');
+
+    return res.status(200).json({ message: "registro funciona" });
+});
+
+module.exports = registerRouter;
