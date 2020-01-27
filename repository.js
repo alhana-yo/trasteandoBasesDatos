@@ -2,39 +2,25 @@
 const MongoClient = require("mongodb").MongoClient;
 const ObjectId = require("mongodb").ObjectId;
 const mongoose = require("mongoose");
+
 const url = "mongodb://localhost:27017/BlogDB";
+
 const defaultBadWords = require("./defBadWords");
-//estas son nuestras colecciones
+const BadWord = require("./models/badwords.js");
+
+const usersModule = require('./repositories/users.js');
+
+//Mongo collections
 let blogEntries; // coleccion de entradas del blog
 
-//Definimos el esquema para las badwords (están mongoose)
-const Schema = mongoose.Schema;
-
-const BadWordSchema = new Schema({
-  badword: String,
-  level: Number
-}, {
-  versionKey: false // set to false then it wont create in mongodb
-});
-
-const UserSchema = new Schema({
-  author: String,
-  nickname: String,
-  role: String
-}, {
-  versionKey: false
-})
-
-const BadWord = mongoose.model("BadWord", BadWordSchema);
-const User = mongoose.model('User', UserSchema);
-
 async function dbConnect() {
-  //creo la conexión a la base de datos con Mongo
+  //Conexión a la base de datos con Mongo
   let conn = await MongoClient.connect(url, {
     useUnifiedTopology: true,
     useNewUrlParser: true
   });
-  //creo la conexión a la base de datos con Mongoose
+
+  //Conexión a la base de datos con Mongoose
   await mongoose.connect(url, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
@@ -42,6 +28,9 @@ async function dbConnect() {
   });
 
   console.log("Connected to Mongo");
+
+  usersModule.createSampleAdmins();
+
   blogEntries = conn.db().collection("blogEntries");
 }
 
@@ -62,10 +51,13 @@ async function isEmpty(collection, defaultContent) {
   }
 }
 
+
 async function main() {
   await dbConnect(); //espera a que se conecte la base de datos
   await isEmpty(BadWord, defaultBadWords);
+  // await isEmpty(Users, defaultAdmins);
 }
+
 
 /***************** BLOGENTRIES COLLECTION *********************/
 exports.insertBlogEntry = async function (newBlogEntry) {
@@ -160,53 +152,5 @@ exports.deleteComment = async function (id, commentForDeletingId) {
   return commentForDeleting;
 };
 /***************** END OF BLOGENTRIES COLLECTION *********************/
-
-/***************** WORDS COLLECTION *********************/
-
-exports.findAllwords = async function () {
-  const badwords = await BadWord.find();
-  return badwords;
-};
-
-exports.findOneWord = async function (id) {
-  const badword = await BadWord.findById(id);
-  return badword;
-};
-
-exports.postOneWord = async function (word) {
-  const badword = new BadWord(word);
-  await badword.save();
-  return badword;
-};
-
-exports.updateOneWord = async function (id, updatedWord) {
-  await BadWord.findByIdAndUpdate(id, updatedWord);
-};
-
-exports.deleteOneWord = async function (id) {
-  await BadWord.findByIdAndRemove(id);
-};
-
-/***************** END OF WORDS COLLECTION **************/
-
-/***************** USERS COLLECTION *********************/
-
-exports.findAllusers = async function () {
-  const users = await User.find();
-  return users;
-};
-
-exports.findOneUser = async function (id) {
-  const user = await User.findById(id);
-  return user;
-};
-
-exports.postOneUser = async function (user) {
-  const newUser = new User(user);
-  await newUser.save();
-  return newUser;
-};
-
-/***************** END OF USERS COLLECTION **************/
 
 main();

@@ -1,7 +1,7 @@
 const express = require('express');
 const badwordRouter = express.Router();
 
-const repository = require("../repository.js");
+const repository = require('../repositories/badwords.js');
 
 badwordRouter.get("/", async (req, res) => {
     const badwords = await repository.findAllwords();
