@@ -30,7 +30,7 @@ registerRouter.post('/', async (req, res) => {
 
     await addUser(username, nickname, password, role = 'publisher');
 
-    return res.status(200).json({ message: "registro funciona" });
+    return res.status(200).json({ message: "user has been successfully registered" });
 });
 
 module.exports = registerRouter;
