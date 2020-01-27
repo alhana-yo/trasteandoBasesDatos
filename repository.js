@@ -55,7 +55,6 @@ async function isEmpty(collection, defaultContent) {
 async function main() {
   await dbConnect(); //espera a que se conecte la base de datos
   await isEmpty(BadWord, defaultBadWords);
-  // await isEmpty(Users, defaultAdmins);
 }
 
 
