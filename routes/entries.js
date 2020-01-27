@@ -134,7 +134,6 @@ entryRouter.post("/:id/comments", async (req, res) => {
           includedWords.words.push(badWordInComment);
         });
 
-
         // res.sendStatus(400)
         res.status(400).json(includedWords);
       }
