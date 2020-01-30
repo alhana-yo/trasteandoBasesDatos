@@ -1,7 +1,7 @@
 const User = require('../models/users.js');
 const bcrypt = require('bcrypt');
 
-const defAdmins = require('../load_admins.js');
+const defAdmins = require('../utils/load_admins.js');
 
 
 exports.createSampleAdmins = async function () {
