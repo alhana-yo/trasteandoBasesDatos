@@ -16,7 +16,7 @@ badwordRouter.get("/:id", async (req, res) => {
     (!badword) ? res.json({ status: "Badword Not Found" }) : res.json(badword);
 });
 
-badwordRouter.post("/", async (req, res) => {
+badwordRouter.post("/", passport.authenticate('jwt', { session: false }), async (req, res) => {
     const badword = await repository.postOneWord(req.body);
     res.json(badword);
 });
