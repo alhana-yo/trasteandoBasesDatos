@@ -2,15 +2,20 @@ const express = require('express');
 const registerRouter = express.Router();
 const addUser = require('../repositories/users.js').addUsers;
 
+const User = require('../models/users.js');
+
 registerRouter.post('/', async (req, res) => {
 
     const { username, nickname, password } = req.body;
 
-    await addUser(username, nickname, password, role = 'publisher');
+    const user = await User.findOne({ username }).exec();
 
-    console.log('entré en el router', username);
-
-    return res.status(200).json({ message: "user has been successfully registered" });
+    if (user === null) {
+        await addUser(username, nickname, password, role = 'publisher');
+        return res.status(200).json({ message: "user has been successfully registered" });
+    } else {
+        return res.status(200).json({ message: "user already exists" });
+    }
 });
 
 module.exports = registerRouter;

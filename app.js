@@ -22,8 +22,9 @@ app.use(passport.initialize());
 
 //Basic Auth
 async function verify(username, password, done) {
+    console.log('users: ', users);
 
-    var user = await users.find(username);
+    const user = await users.find(username);
 
     if (!user) {
         return done(null, false, { message: 'User not found' });
