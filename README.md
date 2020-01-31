@@ -1,4 +1,4 @@
-#API REST BLOG
+# API REST BLOG
 
 ## Functionality
 Implement a service for the management of a blog with persistence and REST API. Blog entries may have comments and to avoid publishing those that may be offensive, the service may internally include a validator.
