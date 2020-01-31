@@ -1,13 +1,13 @@
 module.exports = [
   {
     "username": "bea",
-    "nickname": "bea2020",
+    "nickname": "alhana",
     "password": "pass1",
     "role": "admin"
   },
   {
     "username": "kath",
-    "nickname": "kath2020",
+    "nickname": "biokath",
     "password": "pass2",
     "role": "admin"
   },

@@ -1,13 +1,10 @@
-// Importo MongoDB y Express
 const MongoClient = require("mongodb").MongoClient;
 const ObjectId = require("mongodb").ObjectId;
 const mongoose = require("mongoose");
-
 const url = "mongodb://localhost:27017/BlogDB";
 
 const defaultBadWords = require("./utils/defBadWords.js");
 const BadWord = require("./models/badwords.js");
-
 const usersModule = require('./repositories/users.js');
 
 //Mongo collections
@@ -96,13 +93,6 @@ exports.updatePost = async function (id, newBlogEntry) {
 };
 
 exports.addNewComment = async function (id, blogEntry, newComment) {
-  //Create object with updated fields
-  // const newBlogEntry = {
-  //   postComments: {
-  //     ...blogEntry.postComments,
-  //     newComment
-  //   }
-  // };
 
   //Agregamos una id al comentario
   const myCommentId = new ObjectId();
@@ -114,7 +104,6 @@ exports.addNewComment = async function (id, blogEntry, newComment) {
   await blogEntries.updateOne(
     { _id: new ObjectId(id) },
     { $set: blogEntry }
-    // { $set: newblogEntry }
   );
 };
 

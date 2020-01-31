@@ -2,8 +2,6 @@
 
 exports.validator = function (comment, offensiveWords) {
   let isIncluded = false;
-  console.log('comment: ', comment);
-  console.log('offword: ', offensiveWords);
   let forbiddenWords = [];
   offensiveWords.forEach(word => {
     const commentToLowerCase = comment.toLowerCase();

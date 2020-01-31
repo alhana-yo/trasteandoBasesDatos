@@ -22,8 +22,7 @@ app.use(passport.initialize());
 
 //Basic Auth
 async function verify(username, password, done) {
-
-    var user = await users.find(username);
+    const user = await users.find(username);
 
     if (!user) {
         return done(null, false, { message: 'User not found' });
@@ -59,7 +58,7 @@ const jwtOpts = {
 
 passport.use(new JwtStrategy(jwtOpts, async (payload, done) => {
 
-    var user = await users.find(payload.username);
+    const user = await users.find(payload.username);
 
     if (user) {
         return done(null, user);
