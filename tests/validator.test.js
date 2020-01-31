@@ -1,6 +1,6 @@
 
-const validator = require('../validator.js');
-const badWords = require('../defBadWords.js');
+const validator = require('../utils/validator.js');
+const badWords = require('../utils/defBadWords.js');
 
 describe('comments validator', () => {
     test('verify that the comment has forbidden words', () => {

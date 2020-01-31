@@ -3,8 +3,8 @@ const entryRouter = express.Router();
 
 const badwordsRepository = require("../repositories/badwords.js");
 const entriesRepository = require("../repository.js");
-const toResponse = require("../toResponse.js");
-const validator = require("../validator.js").validator;
+const toResponse = require("../utils/toResponse.js");
+const validator = require("../utils/validator.js").validator;
 
 const passport = require("passport");
 

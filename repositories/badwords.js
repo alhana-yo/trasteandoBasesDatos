@@ -17,9 +17,21 @@ exports.postOneWord = async function (word) {
 };
 
 exports.updateOneWord = async function (id, updatedWord) {
-    await BadWord.findByIdAndUpdate(id, updatedWord);
+    const badword = await BadWord.findById(id);
+    if (badword) {
+        await BadWord.findByIdAndUpdate(id, updatedWord);
+        return true;
+    } else {
+        return false;
+    }
 };
 
 exports.deleteOneWord = async function (id) {
-    await BadWord.findByIdAndRemove(id);
+    const badword = await BadWord.findById(id);
+    if (badword) {
+        await BadWord.findByIdAndRemove(id);
+        return true;
+    } else {
+        return false;
+    }
 };

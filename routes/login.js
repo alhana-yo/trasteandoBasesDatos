@@ -8,7 +8,7 @@ const jwt = require('jsonwebtoken');
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 
-const users = require('../load_admins');
+const users = require('../utils/load_admins.js');
 
 const SECRET_KEY = 'SECRET_KEY'
 

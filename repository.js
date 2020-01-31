@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 
 const url = "mongodb://localhost:27017/BlogDB";
 
-const defaultBadWords = require("./defBadWords");
+const defaultBadWords = require("./utils/defBadWords.js");
 const BadWord = require("./models/badwords.js");
 
 const usersModule = require('./repositories/users.js');
