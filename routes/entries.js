@@ -128,7 +128,8 @@ entryRouter.post("/:id/comments", passport.authenticate('jwt', { session: false 
           .addNewComment(id, blogEntry, newComment);
         //Return new resource
         blogEntry.id = id;
-        res.json(blogEntry);
+        // res.json(blogEntry);
+        res.json(newComment);
       } else {
         const includedWords = { words: [] };
 
