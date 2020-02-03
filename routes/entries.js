@@ -172,9 +172,9 @@ entryRouter.put("/:id/comments/:commentId", async (req, res) => {
     if (!result.isIncluded) {
       await repository.updateComment(id, commentForUpdatingId, newCommentInfo);
       //Return updated resource
-
-      blogEntry = await repository.findPost(id);
-      res.status(200).json(toResponse(blogEntry));
+      res.json(newCommentInfo);
+      // blogEntry = await repository.findPost(id);
+      // res.status(200).json(toResponse(blogEntry));
     } else {
       const includedWords = { words: [] };
 
