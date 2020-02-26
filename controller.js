@@ -17,9 +17,9 @@ app.use(function (req, res, next) {
     "Origin, X-Requested-With, Content-Type, Accept, Authorization"
   );
   res.header("Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, OPTIONS");
-  res.setHeader("Access-Control-Allow-Credentials", "true");
-  res.header("Access-Control-Request-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-  );
+  // res.setHeader("Access-Control-Allow-Credentials", "true");
+  // res.header("Access-Control-Request-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  // );
   next();
 });
 
