@@ -52,22 +52,22 @@ passport.use(new BasicStrategy(verify));
 //   }
 // );
 
-// const jwtOpts = {
-//   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-//   secretOrKey: SECRET_KEY
-// };
+const jwtOpts = {
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: SECRET_KEY
+};
 
-// passport.use(
-//   new JwtStrategy(jwtOpts, async (payload, done) => {
-//     const user = await users.find(payload.username);
+passport.use(
+  new JwtStrategy(jwtOpts, async (payload, done) => {
+    const user = await users.find(payload.username);
 
-//     if (user) {
-//       return done(null, user);
-//     } else {
-//       return done(null, false, { message: "User not found" });
-//     }
-//   })
-// );
+    if (user) {
+      return done(null, user);
+    } else {
+      return done(null, false, { message: "User not found" });
+    }
+  })
+);
 
 https
   .createServer(
