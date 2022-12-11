@@ -6,7 +6,7 @@
   },
   "dependencies": {
     "bcrypt": "^3.0.7",
-    "express": "4.17.1",
+    "express": "4.17.3",
     "fs": "0.0.1-security",
     "https": "^1.0.0",
     "jest": "^24.9.0",
